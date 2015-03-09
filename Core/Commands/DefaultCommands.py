@@ -18,12 +18,14 @@ voted = {}
 vote_subject = None
 vote_callback = None
 
-
 @DispatcherSingleton.register_unknown
 def unknown_command(bot, event, *args):
     bot.send_message(event.conv,
                      '{}: Unknown command!'.format(event.user.full_name))
 
+@DispatcherSingleton.register_hidden
+def restart(bot, event, *args):
+    bot.restart
 
 @DispatcherSingleton.register_hidden
 def think(bot, event, *args):
@@ -469,9 +471,8 @@ def reload(bot, event, *args):
 
 @DispatcherSingleton.register
 def quit(bot, event, *args):
-    print('HangupsBot killed by user {} from conversation {}'.format(event.user.full_name,
-                                                                     get_conv_name(event.conv, truncate=True)))
-    yield from bot._client.disconnect()
+     bot.send_message(event.conv, "Fuck you, I won't do what you tell me!")
+#    yield from bot._client.disconnect()
 
 
 @DispatcherSingleton.register
