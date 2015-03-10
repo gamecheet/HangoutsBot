@@ -503,15 +503,18 @@ def youtube(bot, event, *args):
         if search_terms == "" or search_terms == " ":
             search_terms = "Fabulous Secret Powers"
         query = parse.urlencode({'search_query': search_terms})
-        url = 'https://www.youtube.com/results?%s' \
+        results_url = 'https://www.youtube.com/results?%s' \
               % query
         headers = {
             'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
-        req = request.Request(url, None, headers)
+        req = request.Request(results_url, None, headers)
         resp = request.urlopen(req)
         soup = BeautifulSoup(resp)
+        item_id = soup.div['yt-lockup'][0]['data-context-item-id']
 
         bot.send_message_segments(event.conv, [hangups.ChatMessageSegment('Result:', is_bold=True),
                                                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
                                                hangups.ChatMessageSegment(soup.title.string, hangups.SegmentType.LINK,
-                                                                          link_target=url)])
+                                                                          link_target=results_url)],
+                                               hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                                               hangups.ChatMessageSegment(item_id)
