@@ -502,8 +502,8 @@ def youtube(bot, event, *args):
         search_terms = " ".join(args)
         if search_terms == "" or search_terms == " ":
             search_terms = "Fabulous Secret Powers"
-        query = parse.urlencode({'q': search_terms})
-        url = 'https://www.youtube.com/results?search_query=%s' \
+        query = parse.urlencode({'search_query': search_terms})
+        url = 'https://www.youtube.com/results?%s' \
               % query
         headers = {
             'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
