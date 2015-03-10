@@ -514,10 +514,9 @@ def youtube(bot, event, *args):
         query = parse.urlencode({'v': item_id})
         item_url = 'https://www.youtube.com/watch?%s' \
               % query
+        item_title = soup.find_all("a", class_="yt-uix-tile-link")[0]['title']
 
         bot.send_message_segments(event.conv, [hangups.ChatMessageSegment('Result:', is_bold=True),
                                                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                                               hangups.ChatMessageSegment(soup.title.string, hangups.SegmentType.LINK,
-                                                                          link_target=item_url),
-                                               hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                                               hangups.ChatMessageSegment(item_id)])
+                                               hangups.ChatMessageSegment(item_title, hangups.SegmentType.LINK,
+                                                                          link_target=item_url)])
