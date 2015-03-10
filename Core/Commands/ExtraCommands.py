@@ -204,6 +204,9 @@ def finish(bot, event, *args):
 
         if len(songs) < 1:
             bot.send_message(event.conv, "I couldn't find your lyrics.")
+        if songs[0].artist.name == 'James Joyce':
+            bot.send_message(event.conv, "Get bent, spammer")
+            return
         lyrics = songs[0].raw_lyrics
         anchors = {}
 
