@@ -337,7 +337,13 @@ def rename(bot, event, *args):
                         'Purpose: Changes the chat title of the room.')]
         bot.send_message_segments(event.conv, segments)
     else:
-        yield from bot._client.setchatname(event.conv_id, ' '.join(args))
+        try:
+            title_prefix = bot.config['conversations'][event.conv_id]['title_prefix'] + ' v. '
+        except KeyError:
+            title_prefix = ""
+        #TODO: handle KeyError properly
+        new_title = title_prefix + ' '.join(args)
+        yield from bot._client.setchatname(event.conv_id, new_title)
 
 
 @DispatcherSingleton.register

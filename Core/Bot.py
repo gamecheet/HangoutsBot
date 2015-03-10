@@ -217,6 +217,9 @@ class HangoutsBot(object):
         if not self.get_config_suboption(event.conv_id, 'rename_watching_enabled'):
             return
 
+        event.text = '/rename ' + conv_event.new_name
+        asyncio.async(self._message_handler.handle(event))
+
         # TODO This needs to refactored. No extra-command specific logic should be in the Bot file.
         if DispatcherSingleton.commands['record']:
             if event.conv_event.new_name == '':
