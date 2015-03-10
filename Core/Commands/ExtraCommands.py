@@ -510,11 +510,11 @@ def youtube(bot, event, *args):
         req = request.Request(results_url, None, headers)
         resp = request.urlopen(req)
         soup = BeautifulSoup(resp)
-        item_id = soup.div['yt-lockup'][0]['data-context-item-id']
+        item_id = soup.find_all("div", class_="yt-lockup")[0]['data-context-item-id']
 
         bot.send_message_segments(event.conv, [hangups.ChatMessageSegment('Result:', is_bold=True),
                                                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
                                                hangups.ChatMessageSegment(soup.title.string, hangups.SegmentType.LINK,
                                                                           link_target=results_url),
                                                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                                               hangups.ChatMessageSegment(item_id)]
+                                               hangups.ChatMessageSegment(item_id)])

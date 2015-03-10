@@ -25,7 +25,7 @@ def unknown_command(bot, event, *args):
 
 @DispatcherSingleton.register_hidden
 def restart(bot, event, *args):
-    bot.restart()
+    yield from bot.restart()
 
 @DispatcherSingleton.register_hidden
 def think(bot, event, *args):
