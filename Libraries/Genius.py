@@ -293,14 +293,11 @@ def get_song_artist(url):
     Returns a song's artist, given a URL
     """
 
-    soup = BeautifulSoup(urllib2.urlopen(url).read(), 'html.parser')
-    #For some reason, html was damaged for http://rapgenius.com/Outkast-git-up-git-out-lyrics
-    #other songs from same artist seemed fine without specifying 'html.parser'
+    soup = _get_soup(url)
 
     info = soup.find('div', {"class": "song_info_primary"})
     artistInfo = info.find("span", {"class": "text_artist"})
-    #print artistInfo.find('a').get('href')
-    return Artist(artistInfo.findAll(text=True), RAPGENIUS_URL + artistInfo.find('a').get('href'))
+    return Artist(artistInfo.find('a').string, RAPGENIUS_URL + artistInfo.find('a').get('href'))
 
 
 def get_song_featured_artists(url):
