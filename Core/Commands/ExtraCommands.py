@@ -524,3 +524,15 @@ def youtube(bot, event, *args):
                                                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
                                                hangups.ChatMessageSegment(item_title, hangups.SegmentType.LINK,
                                                                           link_target=item_url)])
+
+@DispatcherSingleton.register
+def linktest(bot, event, *args):
+        link_url = 'http://facepunch.com'
+        link_title = 'Facepunch'
+        bot.send_message_segments(event.conv,
+                                  [hangups.ChatMessageSegment(link_title,
+                                                              hangups.SegmentType.LINK,
+                                                              link_target=link_url),
+                                   hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                                   hangups.ChatMessageSegment(link_url,
+                                                              hangups.SegmentType.LINK)])
