@@ -36,9 +36,23 @@ def log(bot, event, *args):
     log.writelines("\n")
     log.close()
 
-#@DispatcherSingleton.register
-#def rate(bot, event, *args):
-    #ratings = dict(agree=
+@DispatcherSingleton.register
+def rate(bot, event, *args):
+    ratings = dict(
+                   agree="\u2714"
+                  ,disagree="\u274c"
+                  ,winner="\U1f31f"
+                  ,zing="\u26a1"
+                  ,informative="\u2139"
+                  ,friendly="\u2764"
+                  ,optimistic="\U1f308"
+                  ,artistic="\U1f3a8"
+                  ,late="\u23f0"
+                  ,dumb="\U1f4e6"
+                  ,box="\U1f4e6"
+                  )
+
+    bot.send_message(ratings.get(args[0]))
 
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
