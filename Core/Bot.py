@@ -304,6 +304,10 @@ class HangoutsBot(object):
             print('  {} ({})'.format(get_conv_name(c, truncate=True), c.id_))
         print()
 
+        for c in self.list_conversations():
+            self.send_message_segments(c,
+                                       hangups.ChatMessageSegment("I'm alive!"))
+
     def _on_event(self, conv_event):
         """Handle conversation events"""
         if isinstance(conv_event, hangups.ChatMessageEvent):
