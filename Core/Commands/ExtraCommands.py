@@ -32,7 +32,13 @@ def log(bot, event, *args):
     msg = ' '.join(args)
     log = open('log.txt', 'a+')
     log.writelines(msg + "\n")
+    for c in s: log.writelines(ord(c) + " ")
+    log.writelines("\n")
     log.close()
+
+@DispatcherSingleton.register
+def rate(bot, event, *args):
+    #ratings = dict(agree=
 
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
