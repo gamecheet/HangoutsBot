@@ -305,8 +305,10 @@ class HangoutsBot(object):
         print()
 
         for c in self.list_conversations():
-            self.send_message_segments(c,
-                                       hangups.ChatMessageSegment("I'm alive!"))
+            try:
+                if self.bot.config['conversations'][c.conv_id]['welcome_enabled']
+                    msg = "I'm alive!"
+                    self.send_message(c, msg)
 
     def _on_event(self, conv_event):
         """Handle conversation events"""
