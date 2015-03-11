@@ -36,8 +36,8 @@ def log(bot, event, *args):
     log.writelines("\n")
     log.close()
 
-@DispatcherSingleton.register
-def rate(bot, event, *args):
+#@DispatcherSingleton.register
+#def rate(bot, event, *args):
     #ratings = dict(agree=
 
 @DispatcherSingleton.register
