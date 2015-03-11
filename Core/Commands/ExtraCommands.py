@@ -27,6 +27,12 @@ def count(bot, event, *args):
     bot.send_message(event.conv,
                      '"' + words + '"' + " has " + str(count) + (' syllable.' if count == 1 else ' syllables.'))
 
+@DispatcherSingleton.register
+def log(bot, event, *args):
+    msg = ' '.join(args)
+    log = open('log.txt', 'a+')
+    log.writelines(msg + "\n")
+    log.close()
 
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
