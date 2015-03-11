@@ -41,10 +41,12 @@ def rate(bot, event, *args):
     ratings = dict(
                    agree      ="\u2714"
                   ,disagree   ="\u274c"
+                  ,funny      ="\U0001f604"
                   ,winner     ="\U0001f31f"
                   ,zing       ="\u26a1"
                   ,informative="\u2139"
                   ,friendly   ="\u2764"
+                  ,useful     ="\U0001f527"
                   ,optimistic ="\U0001f308"
                   ,artistic   ="\U0001f3a8"
                   ,late       ="\u23f0"
@@ -52,7 +54,10 @@ def rate(bot, event, *args):
                   ,box        ="\U0001f4e6"
                   )
 
-    bot.send_message(event.conv, ratings.get(args[0]))
+    try:
+        bot.send_message(event.conv, ratings[args[0]])
+    except KeyError:
+        bot.send_message("That's not a valid rating. You are \U0001f4e6 x 1")
 
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
