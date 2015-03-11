@@ -57,7 +57,7 @@ def rate(bot, event, *args):
     try:
         bot.send_message(event.conv, ratings[args[0]])
     except KeyError:
-        bot.send_message("That's not a valid rating. You are \U0001f4e6 x 1")
+        bot.send_message(event.conv, "That's not a valid rating. You are \U0001f4e6 x 1")
 
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
