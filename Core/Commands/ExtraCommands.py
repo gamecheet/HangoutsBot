@@ -39,17 +39,17 @@ def log(bot, event, *args):
 @DispatcherSingleton.register
 def rate(bot, event, *args):
     ratings = dict(
-                   agree="\u2714"
-                  ,disagree="\u274c"
-                  ,winner="\U1f31f"
-                  ,zing="\u26a1"
+                   agree      ="\u2714"
+                  ,disagree   ="\u274c"
+                  ,winner     ="\U0001f31f"
+                  ,zing       ="\u26a1"
                   ,informative="\u2139"
-                  ,friendly="\u2764"
-                  ,optimistic="\U1f308"
-                  ,artistic="\U1f3a8"
-                  ,late="\u23f0"
-                  ,dumb="\U1f4e6"
-                  ,box="\U1f4e6"
+                  ,friendly   ="\u2764"
+                  ,optimistic ="\U0001f308"
+                  ,artistic   ="\U0001f3a8"
+                  ,late       ="\u23f0"
+                  ,dumb       ="\U0001f4e6"
+                  ,box        ="\U0001f4e6"
                   )
 
     bot.send_message(ratings.get(args[0]))
