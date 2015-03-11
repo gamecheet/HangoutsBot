@@ -304,11 +304,10 @@ class HangoutsBot(object):
             print('  {} ({})'.format(get_conv_name(c, truncate=True), c.id_))
         print()
 
-        for c_id,c in self.self._conv_list:
-            try:
-                if self.bot.config['conversations'][c_id]['welcome_enabled']
-                    msg = "I'm alive!"
-                    self.send_message(c, msg)
+        msg = "I'm alive!"
+        for c in self.list_conversations():
+            if self.config['conversations'][c.id_].get('welcome_enabled'):
+                self.send_message(c, msg)
 
     def _on_event(self, conv_event):
         """Handle conversation events"""
