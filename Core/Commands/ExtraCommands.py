@@ -32,7 +32,7 @@ def log(bot, event, *args):
     msg = ' '.join(args)
     log = open('log.txt', 'a+')
     log.writelines(msg + "\n")
-    for c in s: log.writelines(ord(c) + " ")
+    for c in msg: log.writelines(hex(ord(c)) + " ")
     log.writelines("\n")
     log.close()
 
