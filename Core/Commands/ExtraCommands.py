@@ -52,7 +52,7 @@ def rate(bot, event, *args):
                   ,box        ="\U0001f4e6"
                   )
 
-    bot.send_message(ratings.get(args[0]))
+    bot.send_message(event.conv, ratings.get(args[0]))
 
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
