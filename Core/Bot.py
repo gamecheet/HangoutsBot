@@ -304,9 +304,9 @@ class HangoutsBot(object):
             print('  {} ({})'.format(get_conv_name(c, truncate=True), c.id_))
         print()
 
-        for c in self.list_conversations():
+        for c_id,c in self.self._conv_list:
             try:
-                if self.bot.config['conversations'][c.conv_id]['welcome_enabled']
+                if self.bot.config['conversations'][c_id]['welcome_enabled']
                     msg = "I'm alive!"
                     self.send_message(c, msg)
 
