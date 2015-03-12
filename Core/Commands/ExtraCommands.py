@@ -570,7 +570,7 @@ def roulette(bot, event, *args):
         roulette._rouletteBullet = random.randrange(0, 6)
         bot.send_message('*SPIN* Are you feeling lucky?')
         return
-    if roulette._rouletteChamber == self._rouletteBullet:
+    if roulette._rouletteChamber == roulette._rouletteBullet:
         roulette._rouletteBullet = random.randrange(0, 6)
         roulette._rouletteChamber = random.randrange(0, 6)
         bot.send_message('*BANG* Hey, who put a blank in here?!')
