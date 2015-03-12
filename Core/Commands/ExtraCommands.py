@@ -597,7 +597,7 @@ def choice(iterable):
 
 def _checkTheBall(questionLength):
     if not hasattr(_checkTheBall, "_responses"):
-        _responses = {'positive': ['It is possible.', 'Yes!', 'Of course.',
+        _checkTheBall._responses = {'positive': ['It is possible.', 'Yes!', 'Of course.',
                            'Naturally.', 'Obviously.', 'It shall be.',
                            'The outlook is good.', 'It is so.',
                            'One would be wise to think so.',
