@@ -42,12 +42,12 @@ def help(bot, event, *args):
 @DispatcherSingleton.register
 def devmode(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Development Mode', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /devmode <on|off>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: When development mode is on, all outputted text will go to the Python console instead of the Hangouts chat.')]
+        segments = UtilBot.text_to_segments("""\
+*Development Mode*
+Usage: /devmode <on|off>
+Purpose: When development mode is on, all outputted text will go to the \
+Python console instead of the Hangouts chat.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         if ''.join(args) == "on":
@@ -59,15 +59,12 @@ def devmode(bot, event, *args):
 @DispatcherSingleton.register
 def define(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Define', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /define <word to search for> <optional: definition number [defaults to 1] OR * to show all definitions>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /define <word to search for> <start index and end index in form of int:int (e.g., /define test 1:3)>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Show definitions for a word.')]
+        segments = UtilBot.text_to_segments("""\
+*Define*
+Usage: /define <word to search for> <optional: definition number [defaults to 1] OR * to show all definitions>
+Usage: /define <word to search for> <start index and end index in form of int:int (e.g., /define test 1:3)>
+Purpose: Show definitions for a word.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         if args[-1].isdigit():
@@ -135,12 +132,11 @@ def define(bot, event, *args):
 @DispatcherSingleton.register
 def wiki(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Wikipedia', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /wiki <keyword to search for> <optional: sentences to display [defaults to 3]>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Get summary from Wikipedia on search parameter.')]
+        segments = UtilBot.text_to_segments("""\
+*Wikipedia*
+Usage: /wiki <keyword to search for> <optional: sentences to display [defaults to 3]>
+Purpose: Get summary from Wikipedia on search parameter.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         from wikipedia import wikipedia, PageError, DisambiguationError
@@ -186,12 +182,11 @@ def wiki(bot, event, *args):
 @DispatcherSingleton.register
 def goog(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Google', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /goog <optional: search parameter>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Get the first result from Google\'s search using search parameter.')]
+        segments = UtilBot.text_to_segments("""\
+*Google*
+Usage: /goog <optional: search parameter>
+Purpose: Get the first result from Google\'s search using search parameter.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         search_terms = " ".join(args)
@@ -215,11 +210,11 @@ def goog(bot, event, *args):
 @DispatcherSingleton.register
 def ping(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Ping', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /ping'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Easy way to check if Bot is running.')]
+        segments = UtilBot.text_to_segments("""\
+*Ping*
+Usage: /ping
+Purpose: Easy way to check if Bot is running.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         bot.send_message(event.conv, 'pong')
@@ -228,12 +223,12 @@ def ping(bot, event, *args):
 @DispatcherSingleton.register
 def echo(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Echo', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /echo <text to echo>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Bot will reply with whatever text is inputted exactly, minus the /echo command.')]
+        segments = UtilBot.text_to_segments("""\
+*Echo*
+Usage: /echo <text to echo>
+Purpose: Bot will reply with whatever text is inputted exactly, \
+minus the /echo command.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         bot.send_message(event.conv, '{}'.format(' '.join(args)))
@@ -242,12 +237,12 @@ def echo(bot, event, *args):
 @DispatcherSingleton.register
 def users(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Users', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /users'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Listing all users in the current hangout (including G + accounts and emails)')]
+        segments = UtilBot.text_to_segments("""\
+*Users*
+Usage: /users
+Purpose: Listing all users in the current hangout (including G + accounts \
+and emails)
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         segments = [hangups.ChatMessageSegment('Users: '.format(len(event.conv.users)),
@@ -270,12 +265,11 @@ def users(bot, event, *args):
 @DispatcherSingleton.register
 def user(bot, event, username, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('User', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /user <user name>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: List information about user.)')]
+        segments = UtilBot.text_to_segments("""\
+*User*
+Usage: /user <user name>
+Purpose: List information about user.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         username_lower = username.strip().lower()
@@ -302,12 +296,12 @@ def user(bot, event, username, *args):
 @DispatcherSingleton.register
 def hangouts(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Hangouts', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /hangouts'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: List all Hangouts this Bot is currently in, along with what settings those Hangouts are using.')]
+        segments = UtilBot.text_to_segments("""\
+*Hangouts*
+Usage: /hangouts
+Purpose: List all Hangouts this Bot is currently in, along with \
+what settings those Hangouts are using.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         segments = [hangups.ChatMessageSegment('Currently In These Hangouts:', is_bold=True),
@@ -329,12 +323,11 @@ def hangouts(bot, event, *args):
 @DispatcherSingleton.register
 def rename(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Rename', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /rename <new title>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Changes the chat title of the room.')]
+        segments = UtilBot.text_to_segments("""\
+*Rename*
+Usage: /rename <new title>
+Purpose: Changes the chat title of the room.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         yield from bot._client.setchatname(event.conv_id, ' '.join(args))
@@ -343,12 +336,11 @@ def rename(bot, event, *args):
 @DispatcherSingleton.register
 def leave(bot, event, conversation=None, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Leave', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /leave'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Leaves the chat room.')]
+        segments = UtilBot.text_to_segments("""\
+*Leave*
+Usage: /leave
+Purpose: Leaves the chat room.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         convs = []
@@ -370,11 +362,11 @@ def leave(bot, event, conversation=None, *args):
 @DispatcherSingleton.register
 def clear(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Clear', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /clear'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Clears the current screen.')]
+        segments = UtilBot.text_to_segments("""\
+*Clear*
+Usage: /clear
+Purpose: Clears the current screen.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         segments = [hangups.ChatMessageSegment('Intentionally not displayed.', hangups.SegmentType.LINE_BREAK),
@@ -399,11 +391,11 @@ def clear(bot, event, *args):
 @DispatcherSingleton.register
 def mute(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Mute', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /mute'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Mutes all non-command replies.')]
+        segments = UtilBot.text_to_segments("""\
+*Mute*
+Usage: /mute
+Purpose: Mutes all non-command replies.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         try:
@@ -417,11 +409,11 @@ def mute(bot, event, *args):
 @DispatcherSingleton.register
 def unmute(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Unmute', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /unmute'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Unmutes all non-command replies.')]
+        segments = UtilBot.text_to_segments("""\
+*Unmute*
+Usage: /unmute
+Purpose: Unmutes all non-command replies.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         try:
@@ -435,11 +427,11 @@ def unmute(bot, event, *args):
 @DispatcherSingleton.register
 def status(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Status', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /status'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Shows current relevant Bot settings.')]
+        segments = UtilBot.text_to_segments("""\
+*Status*
+Usage: /status
+Purpose: Shows current relevant Bot settings.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
 
@@ -454,11 +446,11 @@ def status(bot, event, *args):
 @DispatcherSingleton.register
 def reload(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Reload', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /reload'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Reloads current config file.')]
+        segments = UtilBot.text_to_segments("""\
+*Reload*
+Usage: /reload
+Purpose: Reloads current config file.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         bot.config.load()
@@ -532,22 +524,16 @@ def block(bot, event, username=None, *args):
 @DispatcherSingleton.register
 def vote(bot, event, set_vote=None, *args):
     if set_vote == '?':
-        segments = [hangups.ChatMessageSegment('Vote', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /vote <subject to vote on>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /vote <yea|yes|for|nay|no|against (used to cast a vote)>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /vote cancel'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /vote abstain'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /vote'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /vote admin (used to start a vote for a new conversation admin)'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Starts a vote in which a 50% majority wins.')]
+        segments = UtilBot.text_to_segments("""\
+*Vote*
+Usage: /vote <subject to vote on>
+Usage: /vote <yea|yes|for|nay|no|against (used to cast a vote)>
+Usage: /vote cancel
+Usage: /vote abstain
+Usage: /vote
+Usage: /vote admin (used to start a vote for a new conversation admin)
+Purpose: Starts a vote in which a 50% majority wins.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
 
