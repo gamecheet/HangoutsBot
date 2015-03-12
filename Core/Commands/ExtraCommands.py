@@ -557,3 +557,22 @@ def linktest(bot, event, *args):
                                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
                                    hangups.ChatMessageSegment(link_url,
                                                               hangups.SegmentType.LINK)])
+
+_rouletteChamber = random.randrange(0, 6)
+_rouletteBullet = random.randrange(0, 6)
+@DispatcherSingleton.register
+def roulette(bot, event, *args):
+
+    if args[0] == 'spin':
+        self._rouletteBullet = random.randrange(0, 6)
+        bot.send_message('*SPIN* Are you feeling lucky?')
+        return
+    if self._rouletteChamber == self._rouletteBullet:
+        self._rouletteBullet = random.randrange(0, 6)
+        self._rouletteChamber = random.randrange(0, 6)
+        bot.send_message('*BANG* Hey, who put a blank in here?!')
+        bot.send_message('/me reloads and spins the chambers.')
+        else:
+            bot.send_message('*click*')
+            self._rouletteChamber += 1
+            self._rouletteChamber %= 6
