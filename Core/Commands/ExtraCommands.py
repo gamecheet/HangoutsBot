@@ -578,3 +578,52 @@ def roulette(bot, event, *args):
         bot.send_message(event.conv, '*click*')
         roulette._rouletteChamber += 1
         roulette._rouletteChamber %= 6
+
+#TODO: move this to UtilBot or find a native replacement
+def choice(iterable):
+    if isinstance(iterable, (list, tuple)):
+        return random.choice(iterable)
+    else:
+        n = 1
+        m = new.module('') # Guaranteed unique value.
+        ret = m
+        for x in iterable:
+            if random.random() < 1/n:
+                ret = x
+            n += 1
+        if ret is m:
+            raise IndexError
+        return ret
+
+def _checkTheBall(self, questionLength):
+    if not hasattr(_checkTheBall, "_responses"):
+        _responses = {'positive': ['It is possible.', 'Yes!', 'Of course.',
+                           'Naturally.', 'Obviously.', 'It shall be.',
+                           'The outlook is good.', 'It is so.',
+                           'One would be wise to think so.',
+                           'The answer is certainly yes.'],
+              'negative': ['In your dreams.', 'I doubt it very much.',
+                           'No chance.', 'The outlook is poor.',
+                           'Unlikely.', 'About as likely as pigs flying.',
+                           'You\'re kidding, right?', 'NO!', 'NO.', 'No.',
+                           'The answer is a resounding no.', ],
+              'unknown' : ['Maybe...', 'No clue.', '_I_ don\'t know.',
+                           'The outlook is hazy, please ask again later.',
+                           'What are you asking me for?', 'Come again?',
+                           'You know the answer better than I.',
+                           'The answer is def-- oooh! shiny thing!'],
+             } 
+    if questionLength % 3 == 0:
+        category = 'positive'
+    elif questionLength % 3 == 1:
+        category = 'negative'
+    else:
+        category = 'unknown'
+    return choice(_checkTheBall._responses[category])
+
+@DispatcherSingleton.register
+def eightball(bot, event, *args):
+    if len(args) > 0:
+        bot.send_message(event.conv, _checkTheBall(len(' '.join(args))))
+    else:
+        bot.send_message(event.conv, _checkTheBall(random.randint(0, 2)))
