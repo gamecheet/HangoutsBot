@@ -533,11 +533,11 @@ def YouTube(bot, event, *args):
 @DispatcherSingleton.register
 def youtube(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('YouTube', is_bold=True)] +
+        segments = [hangups.ChatMessageSegment('YouTube', is_bold=True)] + \
                     hangups.from_str("""
-                    Usage: /youtube <optional: search parameter>
-                    Purpose: Get the first result from YouTube\'s search using search parameter.
-                    """)
+Usage: /youtube <optional: search parameter>
+Purpose: Get the first result from YouTube\'s search using search parameter.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         search_terms = " ".join(args)
