@@ -572,7 +572,7 @@ def roulette(bot, event, *args):
         self._rouletteChamber = random.randrange(0, 6)
         bot.send_message('*BANG* Hey, who put a blank in here?!')
         bot.send_message('/me reloads and spins the chambers.')
-        else:
-            bot.send_message('*click*')
-            self._rouletteChamber += 1
-            self._rouletteChamber %= 6
+    else:
+        bot.send_message('*click*')
+        self._rouletteChamber += 1
+        self._rouletteChamber %= 6
