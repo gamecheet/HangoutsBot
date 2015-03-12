@@ -453,10 +453,10 @@ def text_to_segments(text):
     for line in lines[:-1]:
         if line:
             if line[0:2] == '**' and line[-1:-3] == '**':
-                line = line[3:-3]
+                line = line[2:-2]
                 segments.append(hangups.ChatMessageSegment(line, is_italic=True))
             elif line[0] == '*' and line[-1] == '*':
-                line = line[2:-2]
+                line = line[1:-1]
                 segments.append(hangups.ChatMessageSegment(line, is_bold=True))
             else:
                 segments.append(hangups.ChatMessageSegment(line))
