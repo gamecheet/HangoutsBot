@@ -306,7 +306,11 @@ class HangoutsBot(object):
 
         msg = "I'm alive!"
         for c in self.list_conversations():
-            if self.config['conversations'][c.id_].get('welcome_enabled'):
+            try:
+                welcome_enabled = self.config['conversations'][c.id_]['welcome_enabled']
+            except KeyError:
+                welcome_enabled = False
+            if welcome_enabled:
                 self.send_message(c, msg)
 
     def _on_event(self, conv_event):
