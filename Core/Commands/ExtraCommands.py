@@ -568,14 +568,14 @@ def roulette(bot, event, *args):
 
     if len(args) > 0 and args[0] == 'spin':
         roulette._rouletteBullet = random.randrange(0, 6)
-        bot.send_message('*SPIN* Are you feeling lucky?')
+        bot.send_message(event.conv, '*SPIN* Are you feeling lucky?')
         return
     if roulette._rouletteChamber == roulette._rouletteBullet:
         roulette._rouletteBullet = random.randrange(0, 6)
         roulette._rouletteChamber = random.randrange(0, 6)
-        bot.send_message('*BANG* Hey, who put a blank in here?!')
-        bot.send_message('/me reloads and spins the chambers.')
+        bot.send_message(event.conv, '*BANG* Hey, who put a blank in here?!')
+        bot.send_message(event.conv, '/me reloads and spins the chambers.')
     else:
-        bot.send_message('*click*')
+        bot.send_message(event.conv, '*click*')
         roulette._rouletteChamber += 1
         roulette._rouletteChamber %= 6
