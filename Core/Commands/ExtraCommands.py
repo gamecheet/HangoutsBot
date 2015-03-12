@@ -595,7 +595,7 @@ def choice(iterable):
             raise IndexError
         return ret
 
-def _checkTheBall(self, questionLength):
+def _checkTheBall(questionLength):
     if not hasattr(_checkTheBall, "_responses"):
         _responses = {'positive': ['It is possible.', 'Yes!', 'Of course.',
                            'Naturally.', 'Obviously.', 'It shall be.',
