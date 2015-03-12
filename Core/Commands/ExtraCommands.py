@@ -563,7 +563,7 @@ _rouletteBullet = random.randrange(0, 6)
 @DispatcherSingleton.register
 def roulette(bot, event, *args):
 
-    if ''.join(args) != '' and args[0] == 'spin':
+    if len(args) > 0 and args[0] == 'spin':
         self._rouletteBullet = random.randrange(0, 6)
         bot.send_message('*SPIN* Are you feeling lucky?')
         return
