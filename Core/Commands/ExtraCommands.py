@@ -558,10 +558,13 @@ def linktest(bot, event, *args):
                                    hangups.ChatMessageSegment(link_url,
                                                               hangups.SegmentType.LINK)])
 
-_rouletteChamber = random.randrange(0, 6)
-_rouletteBullet = random.randrange(0, 6)
 @DispatcherSingleton.register
 def roulette(bot, event, *args):
+    #static variables
+    if not hasattr(roulette, "_rouletteChamber"):
+        _rouletteChamber = random.randrange(0, 6)
+    if not hasattr(roulette, "_rouletteBullet"):
+        _rouletteBullet = random.randrange(0, 6)
 
     if len(args) > 0 and args[0] == 'spin':
         self._rouletteBullet = random.randrange(0, 6)
