@@ -62,12 +62,12 @@ def rate(bot, event, *args):
 @DispatcherSingleton.register
 def udefine(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Urbanly Define', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /udefine <word to search for> <optional: definition number [defaults to 1st]>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Define a word.')]
+        segments = UtilBot.text_to_segments("""\
+*Urbanly Define*
+Usage: /udefine <word to search for> \
+<optional: definition number [defaults to 1st]>
+Purpose: Define a word.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         api_host = 'http://urbanscraper.herokuapp.com/search/'
@@ -114,19 +114,15 @@ def udefine(bot, event, *args):
 def remind(bot, event, *args):
     # TODO Implement a private chat feature. Have reminders save across reboots?
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Remind', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /remind <optional: date [defaults to today]> <optional: time [defaults to an hour from now]> Message'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /remind'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /remind delete <index to delete>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Will post a message the date and time specified to the current chat. With no arguments, it\'ll list all the reminders.')]
+        segments = UtilBot.text_to_segments("""\
+*Remind*
+Usage: /remind <optional: date [defaults to today]> \
+<optional: time [defaults to an hour from now]> Message
+Usage: /remind
+Usage: /remind delete <index to delete>
+Purpose: Will post a message the date and time specified to \
+the current chat. With no arguments, it'll list all the reminders.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         if len(args) == 0:
@@ -218,12 +214,11 @@ def remind(bot, event, *args):
 @DispatcherSingleton.register
 def finish(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Finish', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /finish <lyrics to finish> <optional: * symbol to show guessed song>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Finish a lyric!')]
+        segments = UtilBot.text_to_segments("""\
+*Finish*
+Usage: /finish <lyrics to finish> <optional: * symbol to show guessed song>
+Purpose: Finish a lyric!
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         showguess = False
@@ -280,28 +275,16 @@ def finish(bot, event, *args):
 @DispatcherSingleton.register
 def record(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Record', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /record <text to record>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /record date <date to show records from>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /record list'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /record search <search term>'),
-                    hangups.ChatMessageSegment(
-                        'Usage: /record strike'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /record'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Store/Show records of conversations. Note: All records will be prepended by: \"On the day of <date>,\" automatically. ')]
+        segments = UtilBot.text_to_segments("""\
+*Record*
+Usage: /record <text to record>
+Usage: /record date <date to show records from>
+Usage: /record list
+Usage: /record search <search term>
+Usage: /record strike
+Usage: /record
+Purpose: Store/Show records of conversations. Note: All records will be prepended by: "On the day of <date>," automatically.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         import datetime
@@ -422,11 +405,11 @@ def trash(bot, event, *args):
 @DispatcherSingleton.register
 def spoof(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Spoof', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /spoof'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Who knows...')]
+        segments = UtilBot.text_to_segments("""\
+*Spoof*
+Usage: /spoof
+Purpose: Who knows...
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         segments = [hangups.ChatMessageSegment('!!! CAUTION !!!', is_bold=True),
@@ -442,11 +425,11 @@ def spoof(bot, event, *args):
 @DispatcherSingleton.register
 def flip(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Flip', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /flip <optional: number of times to flip>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Flips a coin.')]
+        segments = UtilBot.text_to_segments("""\
+*Flip*
+Usage: /flip <optional: number of times to flip>
+Purpose: Flips a coin.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         times = 1
@@ -472,12 +455,12 @@ def flip(bot, event, *args):
 @DispatcherSingleton.register
 def quote(bot, event, *args):
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Quote', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Usage: /quote <optional: terms to search for> <optional: number of quote to show>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Shows a quote.')]
+        segments = UtilBot.text_to_segments("""\
+*Quote*
+Usage: /quote <optional: terms to search for> \
+<optional: number of quote to show>
+Purpose: Shows a quote.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         USER_ID = "3696"
@@ -513,11 +496,11 @@ def quote(bot, event, *args):
 @DispatcherSingleton.register
 def navyseals(bot, event, *args):
      if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('Navy Seals', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /navyseals'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Purpose: Shits fury all over you.')]
+        segments = UtilBot.text_to_segments("""\
+*Navy Seals*
+Usage: /navyseals
+Purpose: Shits fury all over you.
+""")
         bot.send_message_segments(event.conv, segments)
      else:
         bot.send_message(event.conv, "What the fuck did you just fucking say about me, you little bitch? I'll have you know I graduated top of my class in the Navy Seals, and I've been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills. I am trained in gorilla warfare and I'm the top sniper in the entire US armed forces. You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words. You think you can get away with saying that shit to me over the Internet? Think again, fucker. As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life. You're fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and that's just with my bare hands. Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit. If only you could have known what unholy retribution your little “clever” comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn't, you didn't, and now you're paying the price, you goddamn idiot. I will shit fury all over you and you will drown in it. You're fucking dead, kiddo.")
@@ -532,13 +515,13 @@ def YouTube(bot, event, *args):
 
 @DispatcherSingleton.register
 def youtube(bot, event, *args):
+    Segment = hangups.ChatMessageSegment
     if ''.join(args) == '?':
-        segments = [hangups.ChatMessageSegment('YouTube', is_bold=True),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment('Usage: /youtube <optional: search parameter>'),
-                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                    hangups.ChatMessageSegment(
-                        'Purpose: Get the first result from YouTube\'s search using search parameter.')]
+        segments = UtilBot.text_to_segments("""\
+*YouTube*
+Usage: /youtube <optional: search parameter>
+Purpose: Get the first result from YouTube\'s search using search parameter.
+""")
         bot.send_message_segments(event.conv, segments)
     else:
         search_terms = " ".join(args)
