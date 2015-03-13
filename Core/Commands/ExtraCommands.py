@@ -579,7 +579,6 @@ def roulette(bot, event, *args):
         roulette._rouletteChamber += 1
         roulette._rouletteChamber %= 6
 
-<<<<<<< HEAD
 #TODO: move this to UtilBot or find a native replacement
 def choice(iterable):
     if isinstance(iterable, (list, tuple)):
