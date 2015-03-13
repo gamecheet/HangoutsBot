@@ -508,7 +508,7 @@ Purpose: Shits fury all over you.
 @DispatcherSingleton.register
 def yt(bot, event, *args):
     youtube(bot, event, *args)
-	
+    
 @DispatcherSingleton.register
 def YouTube(bot, event, *args):
     youtube(bot, event, *args)
@@ -627,7 +627,7 @@ def eightball(bot, event, *args):
         bot.send_message(event.conv, _checkTheBall(len(' '.join(args))))
     else:
         bot.send_message(event.conv, _checkTheBall(random.randint(0, 2)))
-=======
+
 @DispatcherSingleton.register
 def source(bot, event, *args):
     if ''.join(args) == '?':
@@ -639,9 +639,9 @@ Purpose: Links to the GitHub
         bot.send_message_segments(event.conv, segments)
     else:
         url = 'https://github.com/ShaunOfTheLive/HangoutsBot'
-		segments = hangups.ChatMessageSegment(url, hangups.SegmentType.LINK)
-		bot.send_message_segments(event.conv, segments)
-		
+        segments = [hangups.ChatMessageSegment(url, hangups.SegmentType.LINK)]
+        bot.send_message_segments(event.conv, segments)
+        
 @DispatcherSingleton.register
 def fliptext(bot, event, *args):
     if ''.join(args) == '?':
@@ -652,21 +652,21 @@ Purpose: Flips your message 180 degrees
 """)
         bot.send_message_segments(event.conv, segments)
     else:
-		args = ' '.join(args)
-		flipped = ['\u0250','\u0071','\u0254','\u0070','\u01dd','\u025f',
-		'\u0183','\u0265','\u0131','\u027e','\u029e','\u05df','\u026f',
-		'\u0075','\u006f','\u0064','\u0062','\u0279','\u0073','\u0287',
-		'\u006e','\u028c','\u028d','\u0078','\u028e','\u007a','\u2200',
-		'\u10412','\u03fd','\u15e1','\u018e','\u2132','\u2141','\u0048',
-		'\u0049','\u017f','\u029e','\u2142','\u0057','\u004e','\u004f',
-		'\u0500','\u1f49','\u1d1a','\u0053','\u22a5','\u2229','\u039b',
-		'\u004d','\u0058','\u028e','\u005a']
-		alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		segment = ""
-		for letter in args:
-			new_letter = flipped[alphabet.index(letter)] if letter in alphabet \
-					else letter
-			segment += new_letter
-		segment = segment[::-1]
-		bot.send_message(event.conv, segment)		
-		
+        args = ' '.join(args)
+        flipped = ['\u0250','\u0071','\u0254','\u0070','\u01dd','\u025f',
+        '\u0183','\u0265','\u0131','\u027e','\u029e','\u05df','\u026f',
+        '\u0075','\u006f','\u0064','\u0062','\u0279','\u0073','\u0287',
+        '\u006e','\u028c','\u028d','\u0078','\u028e','\u007a','\u2200',
+        '\u10412','\u03fd','\u15e1','\u018e','\u2132','\u2141','\u0048',
+        '\u0049','\u017f','\u029e','\u2142','\u0057','\u004e','\u004f',
+        '\u0500','\u1f49','\u1d1a','\u0053','\u22a5','\u2229','\u039b',
+        '\u004d','\u0058','\u028e','\u005a']
+        alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        segment = ""
+        for letter in args:
+            new_letter = flipped[alphabet.index(letter)] if letter in alphabet \
+                    else letter
+            segment += new_letter
+        segment = segment[::-1]
+        bot.send_message(event.conv, segment)       
+        
