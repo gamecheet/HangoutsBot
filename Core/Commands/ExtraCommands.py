@@ -19,6 +19,9 @@ from Libraries import Genius
 
 reminders = []
 
+@DispatcherSingleton.register
+def imagetest(bot, event, *args):
+    bot.send_image(event.conv, "6125472845849282034")
 
 @DispatcherSingleton.register
 def count(bot, event, *args):
