@@ -20,16 +20,6 @@ from Libraries import Genius
 reminders = []
 
 @DispatcherSingleton.register
-def imagetest(bot, event, *args):
-    bot.send_image(event.conv, "6125472845849282034")
-
-@DispatcherSingleton.register
-def uploadtest(bot, event, *args):
-    filename = os.path.join('images', 'sanic.png')
-    imageID = yield from bot._client.upload_image(filename)
-    bot.send_image(event.conv, imageID)
-
-@DispatcherSingleton.register
 def img(bot, event, *args):
     if len(args) > 0:
         url = args[0]
