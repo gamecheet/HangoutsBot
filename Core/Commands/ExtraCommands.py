@@ -24,6 +24,22 @@ def imagetest(bot, event, *args):
     bot.send_image(event.conv, "6125472845849282034")
 
 @DispatcherSingleton.register
+def uploadtest(bot, event, *args):
+    filename = os.path.join('images', 'sanic.png')
+    imageID = yield from bot._client.upload_image(filename)
+    bot.send_image(event.conv, imageID)
+
+@DispatcherSingleton.register
+def img(bot, event, *args):
+    if len(args) > 0:
+        url = args[0]
+        filename = os.path.join('images', os.path.basename(url))
+        os.makedirs('images', exist_ok=True)
+        request.urlretrieve(url, filename)
+        imageID = yield from bot._client.upload_image(filename)
+        bot.send_image(event.conv, imageID)
+
+@DispatcherSingleton.register
 def count(bot, event, *args):
     words = ' '.join(args)
     count = UtilBot.syllable_count(words)
