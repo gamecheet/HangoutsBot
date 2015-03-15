@@ -20,6 +20,10 @@ from Libraries import Genius
 reminders = []
 
 @DispatcherSingleton.register
+def image(bot, event, *args):
+    img(bot, event, *args)
+
+@DispatcherSingleton.register
 def img(bot, event, *args):
     if len(args) > 0:
         url = args[0]
