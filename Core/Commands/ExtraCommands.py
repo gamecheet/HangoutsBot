@@ -594,7 +594,8 @@ def linktest(bot, event, *args):
                                                               link_target=link_url),
                                    hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
                                    hangups.ChatMessageSegment(link_url,
-                                                              hangups.SegmentType.LINK)])
+                                                              hangups.SegmentType.LINK,
+                                                              link_target=link_url)])
 
 @DispatcherSingleton.register
 def roulette(bot, event, *args):
@@ -677,7 +678,9 @@ Purpose: Links to the GitHub
         bot.send_message_segments(event.conv, segments)
     else:
         url = 'https://github.com/ShaunOfTheLive/HangoutsBot'
-        segments = [hangups.ChatMessageSegment(url, hangups.SegmentType.LINK)]
+        segments = [hangups.ChatMessageSegment(url,
+                                               hangups.SegmentType.LINK,
+                                               link_target=url)]
         bot.send_message_segments(event.conv, segments)
         
 @DispatcherSingleton.register
