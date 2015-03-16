@@ -27,7 +27,11 @@ def image(bot, event, *args):
 def img(bot, event, *args):
     if len(args) > 0:
         url = args[0]
-        filename = os.path.join('images', os.path.basename(url))
+        headers = requests.head(url).headers
+        if 'content-disposition' in headers.keys():
+            filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
+        else:
+            filename = os.path.join('images', os.path.basename(url))
         os.makedirs('images', exist_ok=True)
         request.urlretrieve(url, filename)
         imageID = yield from bot._client.upload_image(filename)
