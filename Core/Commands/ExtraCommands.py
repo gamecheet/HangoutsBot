@@ -547,8 +547,8 @@ Purpose: but what if bot is not kill
 """)
         bot.send_message_segments(event.conv, segments)
     else:
-    search = ['xfiles','theme']
-    youtube(bot, event, *search)
+        args = ['xfiles','theme']
+        youtube(bot, event, *args)
     
 
 @DispatcherSingleton.register
