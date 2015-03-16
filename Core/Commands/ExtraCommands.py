@@ -536,6 +536,20 @@ def yt(bot, event, *args):
 @DispatcherSingleton.register
 def YouTube(bot, event, *args):
     youtube(bot, event, *args)
+    
+@DispatcherSingleton.register
+def xfiles(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*xfiles*
+Usage: /xfiles
+Purpose: but what if bot is not kill
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+    search = ['xfiles','theme']
+    youtube(bot, event, *search)
+    
 
 @DispatcherSingleton.register
 def youtube(bot, event, *args):
