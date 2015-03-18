@@ -16,7 +16,7 @@ import requests
 from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Util import UtilBot
 from Libraries import Genius
-
+import errno
 
 reminders = []
 
@@ -32,20 +32,39 @@ def image(bot, event, *args):
 def img(bot, event, *args):
     if len(args) > 0:
         url = args[0]
-        headers = requests.head(url).headers
-        if 'content-disposition' in headers.keys():
-            filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
-        else:
-            filename = os.path.join('images', os.path.basename(url))
-        os.makedirs('images', exist_ok=True)
+        file_exception = False
         try:
-            user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 Chrome/18.0.1025.168 Safari/535.19'
-            req = request.urlopen(request.Request(url, headers={'User-Agent': user_agent}))
-            with open(filename, 'wb') as fp:
-                shutil.copyfileobj(req, fp)
-        except error.HTTPError as e:
-            print(e.fp.read())
-        imageID = yield from bot._client.upload_image(filename)
+            imageids_filename = os.path.join('images', 'imageids.json')
+            imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
+            imageID = imageids.get(url)
+        except IOError as e:
+            if e.errno == errno.ENOENT:
+                imageids = {}
+            else:
+               print('Exception:')
+               print(str(e))
+               file_exception = True
+            imageID = None;
+        if imageID is None:
+            headers = requests.head(url).headers
+            if 'content-disposition' in headers.keys():
+                filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
+            else:
+                filename = os.path.join('images', os.path.basename(url))
+            os.makedirs('images', exist_ok=True)
+            try:
+                user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 Chrome/18.0.1025.168 Safari/535.19'
+                req = request.urlopen(request.Request(url, headers={'User-Agent': user_agent}))
+                with open(filename, 'wb') as fp:
+                    shutil.copyfileobj(req, fp)
+            except error.HTTPError as e:
+                print(e.fp.read())
+            imageID = yield from bot._client.upload_image(filename)
+            if not file_exception:
+                imageids[url] = imageID
+                with open(imageids_filename, 'w') as f:
+                    json.dump(imageids, f, indent=2, sort_keys=True)
+                os.remove(filename)
         bot.send_image(event.conv, imageID)
 
 @DispatcherSingleton.register
