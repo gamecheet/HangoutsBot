@@ -21,6 +21,10 @@ from Libraries import Genius
 reminders = []
 
 @DispatcherSingleton.register
+def me(bot, event, *args):
+    pass
+
+@DispatcherSingleton.register
 def image(bot, event, *args):
     yield from img(bot, event, *args)
 
