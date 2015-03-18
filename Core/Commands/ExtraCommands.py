@@ -16,6 +16,7 @@ from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Util import UtilBot
 from Libraries import Genius
 import errno
+from glob import glob
 
 reminders = []
 
@@ -26,6 +27,54 @@ def me(bot, event, *args):
 @DispatcherSingleton.register
 def image(bot, event, *args):
     yield from img(bot, event, *args)
+
+@DispatcherSingleton.register_hidden
+def load_ezhiks(bot, event, *args):
+    file_exception = False
+    # load ezhiks.json
+    try:
+        imageids_filename = 'ezhiks.json'
+        imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
+    except IOError as e:
+        if e.errno == errno.ENOENT:
+            imageids = {}
+        else:
+           print('Exception:')
+           print(str(e))
+           file_exception = True
+    # loop through ezhiks folder
+    for filename in glob(os.path.join('ezhiks', '*')):
+        # if filename not in imageids, upload it and store filename,id
+        filekey = os.path.split(filename)[1]
+        imageID = imageids.get(filekey)
+        if imageID is None:
+            imageID = yield from bot._client.upload_image(filename)
+            if not file_exception:
+                imageids[filekey] = imageID
+                with open(imageids_filename, 'w') as f:
+                    json.dump(imageids, f, indent=2, sort_keys=True)
+                os.remove(filename)
+
+@DispatcherSingleton.register
+def ezhik(bot, event, *args):
+    file_exception = False
+    try:
+        imageids_filename = 'ezhiks.json'
+        imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
+    except IOError as e:
+        imageids = {}
+        if e.errno == errno.ENOENT:
+           print('Exception: ezhiks.json not found!')
+        else:
+           print('Exception:')
+           print(str(e))
+           file_exception = True
+        return
+    imageID = imageids.get(random.choice(list(imageids.keys())))
+    if imageID is None:
+        print('Exception: ezhik not found (this should never happen!)')
+    else:
+        bot.send_image(event.conv, imageID)
 
 @DispatcherSingleton.register
 def img(bot, event, *args):
