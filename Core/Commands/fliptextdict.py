@@ -1,4 +1,11 @@
 fliptextdict = {
+ '!': '\u00a1',
+ "'": ',',
+ '(': ')',
+ '.': '\u02d9',
+ '6': '9',
+ ';': '\u061b',
+ '?': '\u00bf',
  'A': '\u2200',
  'B': '\U00010412',
  'C': '\u03fd',
@@ -25,6 +32,8 @@ fliptextdict = {
  'X': 'X',
  'Y': '\u028e',
  'Z': 'Z',
+ '[': ']',
+ '_': '\u203e',
  'a': '\u0250',
  'b': 'q',
  'c': '\u0254',
@@ -50,5 +59,9 @@ fliptextdict = {
  'w': '\u028d',
  'x': 'x',
  'y': '\u028e',
- 'z': 'z'
+ 'z': 'z',
+ '{': '}'
 }
+
+# add the reverse of every entry to make it symmetrical
+fliptextdict.update({v: k for k, v in fliptextdict.items()})
