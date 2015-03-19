@@ -754,9 +754,7 @@ Purpose: Flips your message 180 degrees
         bot.send_message_segments(event.conv, segments)
     else:
         args = ' '.join(args)
-        output = ''.join(list(map(lambda letter:
-                                      fliptextdict.get(letter, letter),
-                                  args)))
+        output = ''.join([fliptextdict.get(letter, letter) for letter in args])
         output = output[::-1]
         bot.send_message(event.conv, output)
         
