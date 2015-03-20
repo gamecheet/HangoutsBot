@@ -18,6 +18,7 @@ from Libraries import Genius
 import errno
 from glob import glob
 from .fliptextdict import fliptextdict
+from .youtube_banlist import youtube_banlist
 
 reminders = []
 
@@ -639,10 +640,13 @@ Purpose: Get the first result from YouTube\'s search using search parameter.
               % query
         item_title = soup.find_all("a", class_="yt-uix-tile-link")[0]['title']
 
-        bot.send_message_segments(event.conv, [hangups.ChatMessageSegment('Result:', is_bold=True),
-                                               hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
-                                               hangups.ChatMessageSegment(item_title, hangups.SegmentType.LINK,
-                                                                          link_target=item_url)])
+        if item_id in youtube_banlist:
+            bot.send_message(event.conv, 'Sorry, that video is banned.')
+        else:
+            bot.send_message_segments(event.conv, [hangups.ChatMessageSegment('Result:', is_bold=True),
+                                                   hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK),
+                                                   hangups.ChatMessageSegment(item_title, hangups.SegmentType.LINK,
+                                                                              link_target=item_url)])
 
 @DispatcherSingleton.register
 def linktest(bot, event, *args):
