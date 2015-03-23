@@ -779,11 +779,7 @@ Purpose: Renders LaTeX code to an image and sends it
         output = subprocess.check_output(cmd, shell=True)
         output = output.decode(encoding='UTF-8')
         print(output)
-        match = re.search('C(.*?)<', output)
-        if match:
-            filename = match.group(1) + '.png'
-            filename = os.path.join('images', filename)
-            imageID = yield from bot._client.upload_image(filename)
-            bot.send_image(event.conv, imageID)
-        else:
-            bot.send_message("ERROR ERROR")
+        filename = output[1:33] + '.png'
+        filename = os.path.join('images', filename)
+        imageID = yield from bot._client.upload_image(filename)
+        bot.send_image(event.conv, imageID)
