@@ -17,6 +17,7 @@ from Core.Util import UtilBot
 from Libraries import Genius
 import errno
 from glob import glob
+import subprocess
 from .fliptextdict import fliptextdict
 from .youtube_banlist import youtube_banlist
 
@@ -762,3 +763,27 @@ Purpose: Flips your message 180 degrees
         output = output[::-1]
         bot.send_message(event.conv, output)
         
+@DispatcherSingleton.register
+def latex(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*LaTeX*
+Usage: /latex <LaTeX code>
+Purpose: Renders LaTeX code to an image and sends it
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+        cmd = 'texvc /tmp images "' + ' '.join(args) + '"'
+        print('args: ')
+        print(cmd)
+        output = subprocess.check_output(cmd, shell=True)
+        output = output.decode(encoding='UTF-8')
+        print(output)
+        match = re.search('C(.*?)<', output)
+        if match:
+            filename = match.group(1) + '.png'
+            filename = os.path.join('images', filename)
+            imageID = yield from bot._client.upload_image(filename)
+            bot.send_image(event.conv, imageID)
+        else:
+            bot.send_message("ERROR ERROR")
