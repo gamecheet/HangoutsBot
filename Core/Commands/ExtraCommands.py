@@ -773,7 +773,7 @@ Purpose: Renders LaTeX code to an image and sends it
 """)
         bot.send_message_segments(event.conv, segments)
     else:
-        cmd = 'texvc /tmp images "' + ' '.join(args) + '"'
+        cmd = "texvc /tmp images '" + ' '.join(args) + "' utf-8 'rgb 1.0 1.0 1.0'"
         print('args: ')
         print(cmd)
         output = subprocess.check_output(cmd, shell=True)
