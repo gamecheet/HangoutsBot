@@ -785,3 +785,17 @@ Purpose: Renders LaTeX code to an image and sends it
         filename = os.path.join('images', filename)
         imageID = yield from bot._client.upload_image(filename)
         bot.send_image(event.conv, imageID)
+
+@DispatcherSingleton.register
+def greentext(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*Greentext*
+Usage: /greentext <text>
+Purpose: makes your text green and adds an epic maymay arrow
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+        template = "\definecolor{4chan}{RGB}{120,153,34}{\color{4chan}>\!\!\\text{%s}}"
+        args = template % ' '.join(args)
+        yield from latex(bot, event, args)
