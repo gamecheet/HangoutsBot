@@ -799,3 +799,22 @@ Purpose: makes your text green and adds an epic maymay arrow
         template = "\definecolor{4chan}{RGB}{120,153,34}{\color{4chan}>\!\!\\text{%s}}"
         args = template % ' '.join(args)
         yield from latex(bot, event, args)
+
+@DispatcherSingleton.register
+def colour(bot, event, *args):
+    yield from color(bot, event, *args)
+ 
+@DispatcherSingleton.register
+def color(bot, event, *args):
+    filename = 'color.png'
+    cmd = ['convert',
+           '-size',
+           '500x500',
+           'xc:%s' % ' '.join(args),
+           filename]
+    output = subprocess.check_output(cmd)
+    if output != b'':
+        bot.send_message(event.conv, output)
+    imageID = yield from bot._client.upload_image(filename)
+    bot.send_image(event.conv, imageID)
+    os.remove(filename)
