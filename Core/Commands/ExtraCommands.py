@@ -812,9 +812,16 @@ def color(bot, event, *args):
            '500x500',
            'xc:%s' % ' '.join(args),
            filename]
-    output = subprocess.check_output(cmd)
-    if output != b'':
-        bot.send_message(event.conv, output)
-    imageID = yield from bot._client.upload_image(filename)
-    bot.send_image(event.conv, imageID)
-    os.remove(filename)
+    try:
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        output = output.decode(encoding='UTF-8')
+        if output != '':
+            bot.send_message(event.conv, output)
+        imageID = yield from bot._client.upload_image(filename)
+        bot.send_image(event.conv, imageID)
+        os.remove(filename)
+    except subprocess.CalledProcessError as e:
+        output = e.output.decode(encoding='UTF-8')
+        if output != '':
+            bot.send_message(event.conv, output)
+
