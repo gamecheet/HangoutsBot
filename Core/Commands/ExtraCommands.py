@@ -376,17 +376,22 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
         import datetime
 
         global last_recorded, last_recorder
-        directory = "Records" + "\\" + str(event.conv_id)
+        directory = "Records" + os.sep + str(event.conv_id)
         if not os.path.exists(directory):
             os.makedirs(directory)
         filename = str(datetime.date.today()) + ".txt"
+        filepath = os.path.join(directory, filename)
         file = None
+
+        # Deletes the record for the day. TODO Is it possible to make this admin only?
         if ''.join(args) == "clear":
-            file = open(directory + '\\' + filename, "a+")
+            file = open(filepath, "a+")
             file.seek(0)
             file.truncate()
+
+        # Shows the record for the day.
         elif ''.join(args) == '':
-            file = open(directory + '\\' + filename, "a+")
+            file = open(filepath, "a+")
             # If the mode is r+, it won't create the file. If it's a+, I have to seek to the beginning.
             file.seek(0)
             segments = [hangups.ChatMessageSegment(
@@ -398,9 +403,12 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
                 segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
                 segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
             bot.send_message_segments(event.conv, segments)
+
+        # Removes the last line recorded, iff the user striking is the same as the person who recorded last.
+        # TODO This isn't working properly across multiple chats.
         elif args[0] == "strike":
             if event.user.id_ == last_recorder:
-                file = open(directory + '\\' + filename, "a+")
+                file = open(filepath, "a+")
                 file.seek(0)
                 file_lines = file.readlines()
                 if last_recorded is not None and last_recorded in file_lines:
@@ -412,6 +420,8 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
                 last_recorder = None
             else:
                 bot.send_message(event.conv, "You do not have the authority to strike from the Record.")
+
+        # Lists every record available. TODO Paginate this?
         elif args[0] == "list":
             files = os.listdir(directory)
             segments = []
@@ -419,6 +429,8 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
                 segments.append(hangups.ChatMessageSegment(name.replace(".txt", "")))
                 segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
             bot.send_message_segments(event.conv, segments)
+
+        # Shows a list of records that match the search criteria.
         elif args[0] == "search":
             args = args[1:]
             searched_term = ' '.join(args)
@@ -432,7 +444,7 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
             else:
                 term = '.*' + term + '.*'
             foundin = []
-            for name in glob.glob(directory + "\\" + '*.txt'):
+            for name in glob.glob(directory + os.sep + '*.txt'):
                 with open(name) as f:
                     contents = f.read()
                 if re.match(term, contents, re.IGNORECASE | re.DOTALL):
@@ -451,6 +463,8 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
                             hangups.ChatMessageSegment(searched_term, is_bold=True),
                             hangups.ChatMessageSegment(" in any records.")]
                 bot.send_message_segments(event.conv, segments)
+
+        # Lists a record from the specified date.
         elif args[0] == "date":
             from dateutil import parser
 
@@ -461,8 +475,9 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
                 bot.send_message(event.conv, "Couldn't parse " + ' '.join(args) + " as a valid date.")
                 return
             filename = str(dt.date()) + ".txt"
+            filepath = os.path.join(directory, filename)
             try:
-                file = open(directory + '\\' + filename, "r")
+                file = open(filepath, "r")
             except IOError:
                 bot.send_message(event.conv, "No record for the day of " + dt.strftime('%B %d, %Y') + '.')
                 return
@@ -473,8 +488,10 @@ Purpose: Store/Show records of conversations. Note: All records will be prepende
                 segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
                 segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
             bot.send_message_segments(event.conv, segments)
+
+        # Saves a record.
         else:
-            file = open(directory + '\\' + filename, "a+")
+            file = open(filepath, "a+")
             file.write(' '.join(args) + '\n')
             bot.send_message(event.conv, "Record saved successfully.")
             last_recorder = event.user.id_
