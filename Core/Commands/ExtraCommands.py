@@ -811,6 +811,12 @@ def greentext(bot, event, *args):
     Purpose: makes your text green and adds an epic maymay arrow
     """
     filename = 'greentext.png'
+    message = ' '.join(args)
+    if message[0] == '>':
+        message = message[1:]
+    message = message.replace('>', '\n>')
+    message = '>' + message
+    print(message)
     cmd = ['convert',
            '-size',
            '164x',
@@ -822,7 +828,7 @@ def greentext(bot, event, *args):
            '#789922',
            '-background',
            '#ffffee',
-           'caption:>%s' % ' '.join(args),
+           'caption:%s' % message,
            filename]
     try:
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
