@@ -821,7 +821,7 @@ def greentext(bot, event, *args):
            '-size',
            '164x',
            '-font',
-           '/usr/share/fonts/truetype/msttcorefonts/arial.ttf',
+           '/usr/share/fonts/truetype/windows/arial.ttf',
            '-pointsize',
            '13',
            '-fill',
