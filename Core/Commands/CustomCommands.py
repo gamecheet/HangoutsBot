@@ -1,9 +1,12 @@
+import asyncio
+import http.client
 from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Util import UtilBot
 import hangups
 from urllib import parse, request
 from bs4 import BeautifulSoup
 import json
+import re
 import os
 import random
 import errno
@@ -403,27 +406,81 @@ def color(bot, event, *args):
 from pyvirtualdisplay import Display
 from selenium import webdriver
 
+def send_webpage_screenshot(bot, event, url):
+    try:
+        display = Display(visible=0, size=(1280, 1024))
+        display.start()
+
+        browser = webdriver.Firefox()
+        browser.get(url)
+        filename = 'screenie.png'
+
+        ret = browser.save_screenshot(filename)
+        print(str(ret))
+        browser.quit()
+
+        display.stop()   
+
+        imageID = yield from bot._client.upload_image(filename)
+        bot.send_image(event.conv, imageID)
+        os.remove(filename)
+    except http.client.BadStatusLine as e:
+        bot.send_message(event.conv, 'Error: BadStatusLine')
+
 @DispatcherSingleton.register
 def html(bot, event, *args):
-    display = Display(visible=0, size=(1280, 1024))
-    display.start()
-
     html = '<meta charset="utf-8" />' + ' '.join(args)
 
     with open('/var/www/tmp.html', 'w') as f:
         f.write(html)
 
-    browser = webdriver.Firefox()
-    browser.get('http://shaunofthelive.com/tmp.html')
-    filename = 'screenie.png'
+    yield from send_webpage_screenshot(bot, event, 'http://shaunofthelive.com/tmp.html')
 
-    ret = browser.save_screenshot(filename)
-    print(str(ret))
-    browser.quit()
+@DispatcherSingleton.register
+def webshot(bot, event, *args):
+    url = args[0]
 
-    display.stop()   
+    # thanks to dperini and adamrofer
+    urlregex = re.compile(
+        u"^"
+        # protocol identifier
+        u"(?:(?:https?|ftp)://)"
+        # user:pass authentication
+        u"(?:\S+(?::\S*)?@)?"
+        u"(?:"
+        # IP address exclusion
+        # private & local networks
+        u"(?!(?:10|127)(?:\.\d{1,3}){3})"
+        u"(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})"
+        u"(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})"
+        # IP address dotted notation octets
+        # excludes loopback network 0.0.0.0
+        # excludes reserved space >= 224.0.0.0
+        # excludes network & broadcast addresses
+        # (first & last IP address of each class)
+        u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+        u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}"
+        u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
+        u"|"
+        # host name
+        u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
+        # domain name
+        u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+        # TLD identifier
+        u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
+        u")"
+        # port number
+        u"(?::\d{2,5})?"
+        # resource path
+        u"(?:/\S*)?"
+        u"$"
+        , re.UNICODE)
 
-    imageID = yield from bot._client.upload_image(filename)
-    bot.send_image(event.conv, imageID)
-    os.remove(filename)
+    if urlregex.match(url) is None:
+        url = 'http://' + url
+        if urlregex.match(url) is None:
+            bot.send_message(event.conv, "Error: invalid URL.")
+            return            
+
+    yield from send_webpage_screenshot(bot, event, url)
 
