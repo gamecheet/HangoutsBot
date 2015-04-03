@@ -1,3 +1,4 @@
+from Core.Commands.Dispatcher import DispatcherSingleton
 import errno
 from glob import glob
 import subprocess
