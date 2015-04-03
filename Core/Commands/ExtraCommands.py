@@ -868,3 +868,29 @@ def color(bot, event, *args):
         if output != '':
             bot.send_message(event.conv, output)
 
+from pyvirtualdisplay import Display
+from selenium import webdriver
+
+@DispatcherSingleton.register
+def html(bot, event, *args):
+    display = Display(visible=0, size=(1280, 1024))
+    display.start()
+
+    html = '<meta charset="utf-8" />' + ' '.join(args)
+
+    with open('/var/www/tmp.html', 'w') as f:
+        f.write(html)
+
+    browser = webdriver.Firefox()
+    browser.get('http://shaunofthelive.com/tmp.html')
+    filename = 'screenie.png'
+
+    ret = browser.save_screenshot(filename)
+    print(str(ret))
+    browser.quit()
+
+    display.stop()   
+
+    imageID = yield from bot._client.upload_image(filename)
+    bot.send_image(event.conv, imageID)
+    os.remove(filename)
