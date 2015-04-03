@@ -1,7 +1,15 @@
 from Core.Commands.Dispatcher import DispatcherSingleton
+from Core.Util import UtilBot
+import hangups
+from urllib import parse, request
+from bs4 import BeautifulSoup
+import json
+import os
+import random
 import errno
 from glob import glob
 import subprocess
+import types
 from .fliptextdict import fliptextdict
 from .youtube_banlist import youtube_banlist
 
@@ -230,7 +238,7 @@ def choice(iterable):
         return random.choice(iterable)
     else:
         n = 1
-        m = new.module('') # Guaranteed unique value.
+        m = types.ModuleType('') # Guaranteed unique value.
         ret = m
         for x in iterable:
             if random.random() < 1/n:
