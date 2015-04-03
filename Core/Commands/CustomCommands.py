@@ -425,6 +425,7 @@ def send_webpage_screenshot(bot, event, url):
         bot.send_image(event.conv, imageID)
         os.remove(filename)
     except http.client.BadStatusLine as e:
+        display.stop()
         bot.send_message(event.conv, 'Error: BadStatusLine')
 
 @DispatcherSingleton.register
