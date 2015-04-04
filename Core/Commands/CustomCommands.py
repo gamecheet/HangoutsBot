@@ -3,6 +3,7 @@ import http.client
 from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Util import UtilBot
 import hangups
+import urllib
 from urllib import parse, request
 from bs4 import BeautifulSoup
 import json
@@ -428,14 +429,18 @@ def send_webpage_screenshot(bot, event, url):
         display.stop()
         bot.send_message(event.conv, 'Error: BadStatusLine')
 
+def path2url(path):
+    return parse.urljoin(
+      'file:', request.pathname2url(os.path.abspath(path)))
+
 @DispatcherSingleton.register
 def html(bot, event, *args):
     html = '<meta charset="utf-8" />' + ' '.join(args)
 
-    with open('/var/www/tmp.html', 'w') as f:
+    with open('tmp.html', 'w') as f:
         f.write(html)
 
-    yield from send_webpage_screenshot(bot, event, 'http://shaunofthelive.com/tmp.html')
+    yield from send_webpage_screenshot(bot, event, path2url('tmp.html'))
 
 @DispatcherSingleton.register
 def webshot(bot, event, *args):
