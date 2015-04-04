@@ -123,7 +123,7 @@ def img(bot, event, *args):
     if len(args) > 0 and args[0] == 'list':
         aliases = load_json('image_aliases.json')
         segments = []
-        for k in aliases.keys():
+        for k in sorted(aliases.keys()):
             segments.append(hangups.ChatMessageSegment(k))
             segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
         bot.send_message_segments(event.conv, segments)
