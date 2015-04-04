@@ -69,6 +69,51 @@ def ezhik(bot, event, *args):
     else:
         bot.send_image(event.conv, imageID)
 
+def load_json(filename):
+    try:
+        imageids_filename = filename
+        imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
+        return imageids
+    except IOError as e:
+        if e.errno == errno.ENOENT:
+            imageids = {}
+            return imageids
+        else:
+           print('Exception:')
+           print(str(e))
+           return None
+
+@DispatcherSingleton.register_hidden
+def load_aliased_images(bot, event, *args):
+    file_exception = False
+    try:
+        imageids_filename = 'imageids.json'
+        imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
+    except IOError as e:
+        if e.errno == errno.ENOENT:
+            imageids = {}
+        else:
+           print('Exception:')
+           print(str(e))
+           file_exception = True
+    # loop through values in image_aliases.json
+    aliases = load_json('image_aliases.json')
+    for v in aliases.values():
+        print('V = ' + str(v))
+        for url in v if not isinstance(v, str) else [v]:
+            print('URL = ' + url)
+            # if url is not in imageids, upload it and store filename,id
+            imageID = imageids.get(url)
+            if imageID is None:
+                print('URL = ' + url)
+                filename = UtilBot.download_image(url, 'images')
+                imageID = yield from bot._client.upload_image(filename)
+                if not file_exception:
+                    imageids[url] = imageID
+                    with open(imageids_filename, 'w') as f:
+                        json.dump(imageids, f, indent=2, sort_keys=True)
+                    os.remove(filename)
+
 @DispatcherSingleton.register
 def image(bot, event, *args):
     yield from img(bot, event, *args)
@@ -78,8 +123,17 @@ def img(bot, event, *args):
     if len(args) > 0:
         url = args[0]
         file_exception = False
+        aliases = load_json('image_aliases.json')
+        alias_url = aliases.get(url)
+        if alias_url is not None:
+            if isinstance(alias_url, str):
+                url = alias_url
+            elif isinstance(alias_url, list):
+                url = random.choice(alias_url)
+            else:
+                print("Error: alias points to neither list nor string")
         try:
-            imageids_filename = os.path.join('images', 'imageids.json')
+            imageids_filename = 'imageids.json'
             imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
             imageID = imageids.get(url)
         except IOError as e:
