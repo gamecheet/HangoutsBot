@@ -490,19 +490,22 @@ from pyvirtualdisplay import Display
 from selenium import webdriver
 
 def send_webpage_screenshot(bot, event, url):
+    viewportsize = '1280x1024'
+    filename = 'screenie.png'
+
     try:
-        display = Display(visible=0, size=(1280, 1024))
-        display.start()
+        cmd = ['capturejs',
+               '--uri',
+               url,
+               '--viewportsize',
+               viewportsize,
+               '--output',
+               filename]
 
-        browser = webdriver.Firefox()
-        browser.get(url)
-        filename = 'screenie.png'
-
-        ret = browser.save_screenshot(filename)
-        print(str(ret))
-        browser.quit()
-
-        display.stop()   
+        output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        output = output.decode(encoding='UTF-8')
+        if output != '':
+            bot.send_message(event.conv, output)
 
         imageID = yield from bot._client.upload_image(filename)
         bot.send_image(event.conv, imageID)
