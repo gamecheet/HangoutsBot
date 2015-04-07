@@ -489,8 +489,7 @@ def color(bot, event, *args):
 from pyvirtualdisplay import Display
 from selenium import webdriver
 
-def send_webpage_screenshot(bot, event, url):
-    viewportsize = '1280x1024'
+def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
     filename = 'screenie.png'
 
     try:
@@ -529,7 +528,12 @@ def html(bot, event, *args):
 
 @DispatcherSingleton.register
 def webshot(bot, event, *args):
-    url = args[0]
+    if len(args) == 1:
+        url = args[0]
+        viewportsize = '1280x1024'
+    elif len(args) > 1:
+        url = args[0]
+        viewportsize = args[1]
 
     # thanks to dperini and adamrofer
     urlregex = re.compile(
@@ -573,5 +577,5 @@ def webshot(bot, event, *args):
             bot.send_message(event.conv, "Error: invalid URL.")
             return            
 
-    yield from send_webpage_screenshot(bot, event, url)
+    yield from send_webpage_screenshot(bot, event, url, viewportsize)
 
