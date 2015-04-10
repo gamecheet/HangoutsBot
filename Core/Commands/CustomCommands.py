@@ -83,6 +83,10 @@ def load_json(filename):
            print(str(e))
            return None
 
+def save_json(filename, dict):
+    with open(filename, 'w') as f:
+        json.dump(dict, f, indent=2, sort_keys=True)
+
 @DispatcherSingleton.register_hidden
 def load_aliased_images(bot, event, *args):
     file_exception = False
@@ -127,6 +131,23 @@ def img(bot, event, *args):
             segments.append(hangups.ChatMessageSegment(k))
             segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
         bot.send_message_segments(event.conv, segments)
+    elif len(args) > 0 and args[0] == 'add':
+        if len(args) < 3:
+           bot.send_message(event.conv, "Error: not enough arguments")
+           return
+        aliases = load_json('image_aliases.json')
+        alias = args[1]
+        url = args[2]
+        if aliases.get(alias) is not None:
+            bot.send_message(event.conv, "Error: that alias already exists")
+            return
+        print(str(is_valid_url(url)))
+        if not is_valid_url(url):
+            bot.send_message(event.conv, "Error: invalid URL")
+            return
+        aliases[alias] = url
+        bot.send_message(event.conv, "Alias {alias} saved with URL {url}".format(alias=alias,url=url))
+        save_json('image_aliases.json', aliases)
     elif len(args) > 0:
         url = args[0]
         file_exception = False
@@ -526,6 +547,45 @@ def html(bot, event, *args):
 
     yield from send_webpage_screenshot(bot, event, path2url('tmp.html'))
 
+def is_valid_url(url):
+    # thanks to dperini and adamrofer
+    urlregex = re.compile(
+        u"^"
+        # protocol identifier
+        u"(?:(?:https?|ftp)://)"
+        # user:pass authentication
+        u"(?:\s+(?::\s*)?@)?"
+        u"(?:"
+        # ip address exclusion
+        # private & local networks
+        u"(?!(?:10|127)(?:\.\d{1,3}){3})"
+        u"(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})"
+        u"(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})"
+        # ip address dotted notation octets
+        # excludes loopback network 0.0.0.0
+        # excludes reserved space >= 224.0.0.0
+        # excludes network & broadcast addresses
+        # (first & last ip address of each class)
+        u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
+        u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}"
+        u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
+        u"|"
+        # host name
+        u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
+        # domain name
+        u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
+        # tld identifier
+        u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
+        u")"
+        # port number
+        u"(?::\d{2,5})?"
+        # resource path
+        u"(?:/\S*)?"
+        u"$"
+        , re.UNICODE)
+    print(str(urlregex.match(url) is not None))
+    return (urlregex.match(url) is not None)
+
 @DispatcherSingleton.register
 def webshot(bot, event, *args):
     if len(args) == 1:
@@ -541,18 +601,18 @@ def webshot(bot, event, *args):
         # protocol identifier
         u"(?:(?:https?|ftp)://)"
         # user:pass authentication
-        u"(?:\S+(?::\S*)?@)?"
+        u"(?:\s+(?::\s*)?@)?"
         u"(?:"
-        # IP address exclusion
+        # ip address exclusion
         # private & local networks
         u"(?!(?:10|127)(?:\.\d{1,3}){3})"
         u"(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})"
         u"(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})"
-        # IP address dotted notation octets
+        # ip address dotted notation octets
         # excludes loopback network 0.0.0.0
         # excludes reserved space >= 224.0.0.0
         # excludes network & broadcast addresses
-        # (first & last IP address of each class)
+        # (first & last ip address of each class)
         u"(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])"
         u"(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}"
         u"(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))"
@@ -561,13 +621,13 @@ def webshot(bot, event, *args):
         u"(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)"
         # domain name
         u"(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*"
-        # TLD identifier
+        # tld identifier
         u"(?:\.(?:[a-z\u00a1-\uffff]{2,}))"
         u")"
         # port number
         u"(?::\d{2,5})?"
         # resource path
-        u"(?:/\S*)?"
+        u"(?:/\s*)?"
         u"$"
         , re.UNICODE)
 
