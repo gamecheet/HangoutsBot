@@ -26,6 +26,10 @@ def count(bot, event, *args):
                      '"' + words + '"' + " has " + str(count) + (' syllable.' if count == 1 else ' syllables.'))
 
 @DispatcherSingleton.register
+def ud(bot, event, *args):
+    udefine(bot, event, *args)
+
+@DispatcherSingleton.register
 def udefine(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
