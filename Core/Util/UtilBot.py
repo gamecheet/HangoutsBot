@@ -514,7 +514,7 @@ def text_to_segments(text):
 def download_image(url, dir):
     headers = requests.head(url).headers
 
-    if headers.get('content-type') == 'text/html':
+    if headers.get('content-type').partition(';')[0] == 'text/html':
         try:
             soup = BeautifulSoup(request.urlopen(url))
             url = soup.find(property='og:image')['content']
@@ -526,6 +526,7 @@ def download_image(url, dir):
         filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
     else:
         filename = os.path.join(dir, os.path.basename(url))
+        filename = filename.partition('?')[0]
     os.makedirs(dir, exist_ok=True)
     try:
         user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 Chrome/18.0.1025.168 Safari/535.19'
@@ -535,4 +536,9 @@ def download_image(url, dir):
     except error.HTTPError as e:
         print(e.fp.read())
     return filename
+
+def upload_image(bot, filename):
+    with open(filename, 'rb') as f:
+        image_id = yield from bot._client.upload_image(f)
+        return image_id
 
