@@ -254,9 +254,9 @@ class HangoutsBot(object):
             conversation.send_message(segments)
         ).add_done_callback(self._on_message_sent)
 
-    def send_image(self, conversation, imageID):
+    def send_image(self, conversation, image_id, text=None):
         asyncio.async(
-            conversation.send_message(None, imageID)
+            conversation.send_message(None, image_id=image_id)
         ).add_done_callback(self._on_message_sent)
 
     def list_conversations(self):
