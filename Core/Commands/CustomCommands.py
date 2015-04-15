@@ -41,7 +41,7 @@ def load_ezhiks(bot, event, *args):
         filekey = os.path.split(filename)[1]
         imageID = imageids.get(filekey)
         if imageID is None:
-            imageID = yield from bot._client.upload_image(filename)
+            imageID = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
                 imageids[filekey] = imageID
                 with open(imageids_filename, 'w') as f:
@@ -111,7 +111,7 @@ def load_aliased_images(bot, event, *args):
             if imageID is None:
                 print('URL = ' + url)
                 filename = UtilBot.download_image(url, 'images')
-                imageID = yield from bot._client.upload_image(filename)
+                imageID = yield from UtilBot.upload_image(bot, filename)
                 if not file_exception:
                     imageids[url] = imageID
                     with open(imageids_filename, 'w') as f:
@@ -439,7 +439,7 @@ Purpose: Renders LaTeX code to an image and sends it
         print(output)
         filename = output[1:33] + '.png'
         filename = os.path.join('images', filename)
-        imageID = yield from bot._client.upload_image(filename)
+        imageID = yield from UtilBot.upload_image(bot, filename)
         bot.send_image(event.conv, imageID)
 
 @DispatcherSingleton.register
@@ -474,7 +474,7 @@ def greentext(bot, event, *args):
         output = output.decode(encoding='UTF-8')
         if output != '':
             bot.send_message(event.conv, output)
-        imageID = yield from bot._client.upload_image(filename)
+        imageID = yield from UtilBot.upload_image(bot, filename)
         bot.send_image(event.conv, imageID)
         os.remove(filename)
     except subprocess.CalledProcessError as e:
@@ -499,7 +499,7 @@ def color(bot, event, *args):
         output = output.decode(encoding='UTF-8')
         if output != '':
             bot.send_message(event.conv, output)
-        imageID = yield from bot._client.upload_image(filename)
+        imageID = yield from UtilBot.upload_image(bot, filename)
         bot.send_image(event.conv, imageID)
         os.remove(filename)
     except subprocess.CalledProcessError as e:
@@ -527,7 +527,7 @@ def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
         if output != '':
             bot.send_message(event.conv, output)
 
-        imageID = yield from bot._client.upload_image(filename)
+        imageID = yield from UtilBot.upload_image(bot, filename)
         bot.send_image(event.conv, imageID)
         os.remove(filename)
     except http.client.BadStatusLine as e:
