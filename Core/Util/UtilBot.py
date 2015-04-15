@@ -513,6 +513,15 @@ def text_to_segments(text):
 
 def download_image(url, dir):
     headers = requests.head(url).headers
+
+    if headers.get('content-type') == 'text/html':
+        try:
+            soup = BeautifulSoup(request.urlopen(url))
+            url = soup.find(property='og:image')['content']
+            headers = requests.head(url).headers
+        except Exception as e:
+            print(e)
+        
     if 'content-disposition' in headers.keys():
         filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
     else:
