@@ -15,7 +15,6 @@ from glob import glob
 import subprocess
 import types
 from .fliptextdict import fliptextdict
-from .youtube_banlist import youtube_banlist
 
 @DispatcherSingleton.register
 def me(bot, event, *args):
@@ -296,6 +295,8 @@ Purpose: Get the first result from YouTube\'s search using search parameter.
         item_url = 'https://www.youtube.com/watch?%s' \
               % query
         item_title = soup.find_all("a", class_="yt-uix-tile-link")[0]['title']
+
+        youtube_banlist = load_json('youtube_banlist.json')
 
         if item_id in youtube_banlist:
             bot.send_message(event.conv, 'Sorry, that video is banned.')
