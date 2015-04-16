@@ -1,6 +1,6 @@
 from bisect import bisect_left
 import os
-from urllib import request, error
+from urllib import parse, request, error
 from bs4 import BeautifulSoup, Tag
 import re
 import requests
@@ -541,4 +541,23 @@ def upload_image(bot, filename):
     with open(filename, 'rb') as f:
         image_id = yield from bot._client.upload_image(f)
         return image_id
+
+def find_youtube_info(search_terms):
+    if search_terms == "" or search_terms == " ":
+        search_terms = "Fabulous Secret Powers"
+    query = parse.urlencode({'search_query': search_terms, 'filters': 'video'})
+    results_url = 'https://www.youtube.com/results?%s' \
+          % query
+    headers = {
+        'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'}
+    req = request.Request(results_url, None, headers)
+    resp = request.urlopen(req)
+    soup = BeautifulSoup(resp)
+    item_id = soup.find_all("div", class_="yt-lockup")[0]['data-context-item-id']
+    query = parse.urlencode({'v': item_id})
+    item_url = 'https://www.youtube.com/watch?%s' \
+          % query
+    item_title = soup.find_all("a", class_="yt-uix-tile-link")[0]['title']
+
+    return {'item_id':item_id, 'item_url':item_url, 'item_title':item_title}
 
