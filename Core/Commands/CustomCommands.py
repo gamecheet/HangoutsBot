@@ -268,6 +268,21 @@ Purpose: but what if bot is not kill
         youtube(bot, event, *args)
 
 @DispatcherSingleton.register
+def ytban(bot, event, *args):
+    search_terms = " ".join(args)
+    youtube_info = UtilBot.find_youtube_info(search_terms)
+    youtube_banlist = load_json('youtube_banlist.json')
+
+    if youtube_info['item_id'] not in youtube_banlist:
+        youtube_banlist.append(youtube_info['item_id'])
+
+    bot.send_message(event.conv,
+                     'Video "{title}" with ID "{id}" is now banned'.format(
+                       title=youtube_info['item_title'], id=youtube_info['item_id']))
+
+    save_json('youtube_banlist.json', youtube_banlist)
+
+@DispatcherSingleton.register
 def youtube(bot, event, *args):
     Segment = hangups.ChatMessageSegment
     if ''.join(args) == '?':
