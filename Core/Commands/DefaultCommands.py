@@ -24,8 +24,14 @@ def unknown_command(bot, event, *args):
 
 @DispatcherSingleton.register_hidden
 def think(bot, event, *args):
-    if clever_session:
-        yield from bot.send_message(event.conv, clever_session.think(' '.join(args)))
+    if not hasattr(think, "_clever_sessions"):
+        think._clever_sessions = {}
+    clever_sessions = think._clever_sessions
+    clever_session = clever_sessions.get(event.user.id_.chat_id)
+    if clever_session is None:
+        clever_sessions[event.user.id_.chat_id] = ChatterBotFactory().create(ChatterBotType.CLEVERBOT).create_session()
+        clever_session = clever_sessions[event.user.id_.chat_id]
+    bot.send_message(event.conv, clever_session.think(' '.join(args)))
 
 
 @DispatcherSingleton.register
