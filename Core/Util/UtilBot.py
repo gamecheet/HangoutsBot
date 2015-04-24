@@ -513,17 +513,25 @@ def text_to_segments(text):
 
     return segments
 
-def download_image(url, dir):
+def get_image_url(url):
     headers = requests.head(url).headers
     content_type = headers.get('content-type').partition(';')[0]
     if content_type == 'text/html':
         try:
             soup = BeautifulSoup(request.urlopen(url))
             url = soup.find(property='og:image')['content']
-            headers = requests.head(url).headers
-            content_type = headers.get('content-type').partition(';')[0]
-        except Exception as e:
+            # for imgur, don't use the FB thumbnail
+            if 'imgur' in url and '?fb' in url:
+                url = url[:-3]
+        except exception as e:
             print(e)
+    return url
+
+def download_image(url, dir, get_image_url=True):
+    if get_image_url:
+        get_image_url(url)
+    headers = requests.head(url).headers
+    content_type = headers.get('content-type').partition(';')[0]
         
     rename_later = False
     if 'content-disposition' in headers.keys():
