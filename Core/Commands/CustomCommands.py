@@ -609,3 +609,11 @@ def webshot(bot, event, *args):
 
     yield from send_webpage_screenshot(bot, event, url, viewportsize)
 
+@DispatcherSingleton.register
+def subreddit(bot, event, *args):
+    reddit_url_prefix = 'https://www.reddit.com/r/'
+    link_url = reddit_url_prefix + args[0]
+    bot.send_message_segments(event.conv,
+                              [hangups.ChatMessageSegment(link_url,
+                                                         hangups.SegmentType.LINK,
+                                                         link_target=link_url)])
