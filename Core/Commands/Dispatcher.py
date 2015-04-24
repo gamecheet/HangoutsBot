@@ -35,6 +35,11 @@ class CommandDispatcher(object):
             command = args[0][len(bot_command_char):]
         else:
             command = args[0]
+        if command[:2] == 'r/':
+            command = 'subreddit'
+            args = list(args)
+            print(args)
+            args.insert(1, args[0][3:])
         try:
             func = self.commands[command]
         except KeyError:
@@ -81,3 +86,4 @@ class CommandDispatcher(object):
 
 # CommandDispatcher singleton
 DispatcherSingleton = CommandDispatcher()
+
