@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup, Tag
 import re
 import requests
 import shutil
+import imghdr
 import hangups
 
 __author__ = 'wardellchandler'
@@ -527,6 +528,9 @@ def download_image(url, dir):
     else:
         filename = os.path.join(dir, os.path.basename(url))
         filename = filename.partition('?')[0]
+        ext = imghdr.what(filename)
+        if filename[-4:] != ('.' + ext):
+            filename = filename + '.' + ext
     os.makedirs(dir, exist_ok=True)
     try:
         user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 Chrome/18.0.1025.168 Safari/535.19'
