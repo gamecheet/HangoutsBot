@@ -176,7 +176,8 @@ def img(bot, event, *args):
                file_exception = True
             imageID = None;
         if imageID is None:
-            filename = UtilBot.download_image(url, 'images')
+            url = UtilBot.get_image_url(url)
+            filename = UtilBot.download_image(url, 'images', False)
             imageID = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
                 imageids[url] = imageID
