@@ -149,9 +149,13 @@ def img(bot, event, *args):
         save_json('image_aliases.json', aliases)
     elif len(args) > 0:
         url = args[0]
+        alias = ''.join(args)
+        alias = alias.replace(" ","")
+        alias = alias.replace("'","")
+        alias = alias.lower()
         file_exception = False
         aliases = load_json('image_aliases.json')
-        alias_url = aliases.get(url)
+        alias_url = aliases.get(alias)
         if alias_url is not None:
             if isinstance(alias_url, str):
                 url = alias_url
