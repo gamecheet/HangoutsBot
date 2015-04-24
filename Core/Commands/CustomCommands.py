@@ -5,6 +5,7 @@ from Core.Util import UtilBot
 import hangups
 import urllib
 from urllib import parse, request
+import requests
 from bs4 import BeautifulSoup
 import json
 import re
@@ -614,7 +615,12 @@ def subreddit(bot, event, *args):
     subreddit = args[0]
     reddit_url_prefix = 'https://www.reddit.com/r/'
     link_url = reddit_url_prefix + subreddit
-    bot.send_message_segments(event.conv,
-                              [hangups.ChatMessageSegment(link_url,
-                                                         hangups.SegmentType.LINK,
-                                                         link_target=link_url)])
+
+    res = requests.head(link_url)
+    if res.status_code == 302 and 'subreddits/search' in res.headers.get('location'):
+        bot.send_message(event.conv, "That subreddit does not exist.")
+    else:
+        bot.send_message_segments(event.conv,
+                                  [hangups.ChatMessageSegment(link_url,
+                                                             hangups.SegmentType.LINK,
+                                                             link_target=link_url)])
