@@ -611,8 +611,9 @@ def webshot(bot, event, *args):
 
 @DispatcherSingleton.register
 def subreddit(bot, event, *args):
+    subreddit = args[0]
     reddit_url_prefix = 'https://www.reddit.com/r/'
-    link_url = reddit_url_prefix + args[0]
+    link_url = reddit_url_prefix + subreddit
     bot.send_message_segments(event.conv,
                               [hangups.ChatMessageSegment(link_url,
                                                          hangups.SegmentType.LINK,
