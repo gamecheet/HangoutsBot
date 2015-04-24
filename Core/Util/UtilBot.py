@@ -6,6 +6,7 @@ import re
 import requests
 import shutil
 import imghdr
+import mimetypes
 import hangups
 
 __author__ = 'wardellchandler'
@@ -514,29 +515,43 @@ def text_to_segments(text):
 
 def download_image(url, dir):
     headers = requests.head(url).headers
-
-    if headers.get('content-type').partition(';')[0] == 'text/html':
+    content_type = headers.get('content-type').partition(';')[0]
+    if content_type == 'text/html':
         try:
             soup = BeautifulSoup(request.urlopen(url))
             url = soup.find(property='og:image')['content']
             headers = requests.head(url).headers
+            content_type = headers.get('content-type').partition(';')[0]
         except Exception as e:
             print(e)
         
+    rename_later = False
     if 'content-disposition' in headers.keys():
         filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
     else:
         filename = os.path.join(dir, os.path.basename(url))
         filename = filename.partition('?')[0]
-        ext = imghdr.what(filename)
-        if filename[-4:] != ('.' + ext):
-            filename = filename + '.' + ext
+        ext = mimetypes.guess_extension(content_type)
+        if ext is None:
+            rename_later = True
+        else:
+            if filename[-4:] != ext:
+                filename = filename + ext
     os.makedirs(dir, exist_ok=True)
     try:
         user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 Chrome/18.0.1025.168 Safari/535.19'
         req = request.urlopen(request.Request(url, headers={'User-Agent': user_agent}))
         with open(filename, 'wb') as fp:
             shutil.copyfileobj(req, fp)
+        if rename_later:
+            ext = imghdr.what(filename)
+            if ext is None:
+                raise TypeError('Invalid image type.')
+            else:
+                if filename[-4:] != ('.' + ext):
+                    oldfilename = filename
+                    filename = filename + '.' + ext
+                    os.rename(oldfilename, filename)
     except error.HTTPError as e:
         print(e.fp.read())
     return filename
