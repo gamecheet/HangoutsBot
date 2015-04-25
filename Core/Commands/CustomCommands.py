@@ -617,7 +617,9 @@ def subreddit(bot, event, *args):
     link_url = reddit_url_prefix + subreddit
 
     res = requests.head(link_url)
-    if res.status_code == 302 and 'subreddits/search' in res.headers.get('location'):
+    if (res.status_code == 404 or
+           (res.status_code == 302 and
+            'subreddits/search' in res.headers.get('location'))):
         bot.send_message(event.conv, "That subreddit does not exist.")
     else:
         bot.send_message_segments(event.conv,
