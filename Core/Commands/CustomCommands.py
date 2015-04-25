@@ -616,7 +616,8 @@ def subreddit(bot, event, *args):
     reddit_url_prefix = 'https://www.reddit.com/r/'
     link_url = reddit_url_prefix + subreddit
 
-    res = requests.head(link_url)
+    user_agent = 'python:HangoutsBot:r233 (by /u/shillbert)'
+    res = requests.head(link_url, headers={'User-Agent': user_agent})
     if (res.status_code == 404 or
            (res.status_code == 302 and
             'subreddits/search' in res.headers.get('location'))):
