@@ -4,7 +4,7 @@ from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Util import UtilBot
 import hangups
 import urllib
-from urllib import parse, request
+from urllib import parse, request, error
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -631,3 +631,56 @@ def subreddit(bot, event, *args):
                                   [hangups.ChatMessageSegment(link_url,
                                                              hangups.SegmentType.LINK,
                                                              link_target=link_url)])
+
+# thanks to Bruno Bronosky on StackOverflow
+def is_integer(i):
+    i = str(i)
+    return i=='0' or (i if i.find('..') > -1 else i.lstrip('-+').rstrip('0').rstrip('.')).isdigit()
+
+@DispatcherSingleton.register
+def isch(bot, event, *args):
+    yield from imagesearch(bot, event, *args)
+
+@DispatcherSingleton.register
+def imagesearch(bot, event, *args):
+    num_requested = 0
+    if len(args) == 0:
+        bot.send_message(event.conv, "Error: requires more than 0 arguments.")
+        return
+    else:
+        if args[-1] == '*':
+            args = args[:-1]
+            returnall = True
+        if is_integer(args[-1]):
+            # we subtract one here because image #1 is the 0 item in the list
+            num_requested = int(args[-1]) - 1
+            args = args[:-1]
+
+    if num_requested > 9 or num_requested < 0:
+        bot.send_message(event.conv,
+                         "Error: result number must be between 1 and 10.")
+        return
+
+    query = ' '.join(args)
+    search_engine_id = bot.get_config_suboption(event.conv_id, 'search_engine_id')
+    api_key = bot.get_config_suboption(event.conv_id, 'api_key')
+
+    query_string = parse.urlencode(
+{'q': query,
+ 'cx': search_engine_id, 
+ 'searchType': 'image',
+ 'safe': 'off',
+ 'key': api_key
+})
+    url = 'https://www.googleapis.com/customsearch/v1?%s' \
+          % query_string
+
+    try:
+        response = requests.get(url)
+        result = response.content.decode()
+        result_list = json.loads(result)
+        image_url = result_list['items'][num_requested]['link']
+        args = [image_url]
+        yield from img(bot, event, *args)
+    except error.HTTPError as e:
+        print(e.fp.read())
