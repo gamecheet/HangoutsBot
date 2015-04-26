@@ -648,12 +648,9 @@ def imagesearch(bot, event, *args):
         bot.send_message(event.conv, "Error: requires more than 0 arguments.")
         return
     else:
-        if args[-1] == '*':
-            args = args[:-1]
-            returnall = True
-        if is_integer(args[-1]):
+        if args[-1][0] == '@' and is_integer(args[-1][1:]):
             # we subtract one here because image #1 is the 0 item in the list
-            num_requested = int(args[-1]) - 1
+            num_requested = int(args[-1][1:]) - 1
             args = args[:-1]
 
     if num_requested > 9 or num_requested < 0:
