@@ -136,8 +136,12 @@ def img(bot, event, *args):
            bot.send_message(event.conv, "Error: not enough arguments")
            return
         aliases = load_json('image_aliases.json')
-        alias = args[1]
-        url = args[2]
+        # alias is all arguments except the first and last
+        alias = ''.join(args[1:len(args)-1])
+        # strip spaces and non-alphanumeric characters
+        alias = ''.join(filter(str.isalnum, alias))
+        alias = alias.lower()
+        url = args[len(args)-1]
         if aliases.get(alias) is not None:
             bot.send_message(event.conv, "Error: that alias already exists")
             return
@@ -151,8 +155,8 @@ def img(bot, event, *args):
     elif len(args) > 0:
         url = args[0]
         alias = ''.join(args)
-        alias = alias.replace(" ","")
-        alias = alias.replace("'","")
+        # strip spaces and non-alphanumeric characters
+        alias = ''.join(filter(str.isalnum, alias))
         alias = alias.lower()
         file_exception = False
         aliases = load_json('image_aliases.json')
