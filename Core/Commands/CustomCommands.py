@@ -643,6 +643,12 @@ def isch(bot, event, *args):
 
 @DispatcherSingleton.register
 def imagesearch(bot, event, *args):
+    """
+    *Google Image Search*
+    Usage: /isch <search terms> @<result number>
+    or: /imagesearch <search terms> @<result number>
+    Purpose: Searches Google Images and displays the image.
+    """
     num_requested = 0
     if len(args) == 0:
         bot.send_message(event.conv, "Error: requires more than 0 arguments.")
