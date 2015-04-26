@@ -639,14 +639,18 @@ def is_integer(i):
 
 @DispatcherSingleton.register
 def isch(bot, event, *args):
+    """
+    *Google Image Search*
+    Usage: /isch <search terms> @<result number>
+    Purpose: Searches Google Images and displays the image.
+    """
     yield from imagesearch(bot, event, *args)
 
 @DispatcherSingleton.register
 def imagesearch(bot, event, *args):
     """
     *Google Image Search*
-    Usage: /isch <search terms> @<result number>
-    or: /imagesearch <search terms> @<result number>
+    Usage: /imagesearch <search terms> @<result number>
     Purpose: Searches Google Images and displays the image.
     """
     num_requested = 0
