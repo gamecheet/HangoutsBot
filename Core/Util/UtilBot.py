@@ -523,7 +523,7 @@ def get_image_url(url):
             # for imgur, don't use the FB thumbnail
             if 'imgur' in url and '?fb' in url:
                 url = url[:-3]
-        except exception as e:
+        except Exception as e:
             print(e)
     return url
 
