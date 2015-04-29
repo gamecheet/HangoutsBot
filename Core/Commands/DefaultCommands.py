@@ -362,6 +362,11 @@ def leave(bot, event, conversation=None, *args):
 
 
 @DispatcherSingleton.register
+def clr(bot, event, *args):
+    clear(bot, event, *args)
+
+
+@DispatcherSingleton.register
 def clear(bot, event, *args):
     """
     *Clear:*
