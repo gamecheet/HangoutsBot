@@ -83,8 +83,10 @@ class MessageHandler(object):
                                   '{}: Not a valid command.'.format(event.user.full_name))
             return
 
+        line_args[0] = line_args[0].lower()
+
         # Test if user has permissions for running command
-        if self._check_if_can_run_command(event, line_args[0].lower().replace(self.command_char, '')):
+        if self._check_if_can_run_command(event, line_args[0].replace(self.command_char, '')):
             # Run command
             yield from DispatcherSingleton.run(self.bot, event, self.command_char, *line_args[0:])
         else:
