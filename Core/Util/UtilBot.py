@@ -530,7 +530,7 @@ def get_image_url(url):
 def download_image(url, dir, get_image_url=True):
     if get_image_url:
         get_image_url(url)
-    headers = requests.head(url).headers
+    headers = requests.head(url, allow_redirects=True).headers
     content_type = headers.get('content-type').partition(';')[0]
         
     rename_later = False
