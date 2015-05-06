@@ -530,7 +530,14 @@ def get_image_url(url):
 def download_image(url, dir, get_image_url=True):
     if get_image_url:
         url = get_image_url(url)
-    headers = requests.head(url, allow_redirects=True).headers
+
+    user_agent = ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 '
+                  '(KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 '
+                  'Chrome/18.0.1025.168 Safari/535.19')
+    request_headers = {'accept-encoding': 'gzip, deflate',
+                       'user-agent': user_agent}
+
+    headers = requests.head(url, allow_redirects=True, headers=request_headers).headers
     content_type = headers.get('content-type').partition(';')[0]
 
     rename_later = False
@@ -547,8 +554,8 @@ def download_image(url, dir, get_image_url=True):
                 filename = filename + ext
     os.makedirs(dir, exist_ok=True)
     try:
-        user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 (KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 Chrome/18.0.1025.168 Safari/535.19'
-        req = request.urlopen(request.Request(url, headers={'User-Agent': user_agent}))
+        # TODO: switch to requests library
+        req = request.urlopen(request.Request(url, headers=request_headers))
         with open(filename, 'wb') as fp:
             shutil.copyfileobj(req, fp)
         if rename_later:
