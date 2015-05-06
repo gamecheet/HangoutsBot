@@ -154,11 +154,6 @@ def img(bot, event, *args):
         save_json('image_aliases.json', aliases)
     elif len(args) > 0:
         url = args[0]
-        if not is_valid_url(url):
-            url = 'http://' + url
-            if not is_valid_url(url):
-                bot.send_message(event.conv, "Error: invalid URL.")
-                return            
         alias = ''.join(args)
         # strip spaces and non-alphanumeric characters
         alias = ''.join(filter(str.isalnum, alias))
@@ -173,6 +168,11 @@ def img(bot, event, *args):
                 url = random.choice(alias_url)
             else:
                 print("Error: alias points to neither list nor string")
+        if not is_valid_url(url):
+            url = 'http://' + url
+            if not is_valid_url(url):
+                bot.send_message(event.conv, "Error: invalid alias or URL.")
+                return            
         try:
             imageids_filename = 'imageids.json'
             imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
