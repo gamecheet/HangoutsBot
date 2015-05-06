@@ -533,17 +533,17 @@ def get_proper_filename(filename, content_type=None):
     ext = None
     if content_type:
         ext = mimetypes.guess_extension(content_type)
-        ext = 'jpg' if ext == 'jpeg' else ext
+        ext = 'jpg' if ext in ['jpe', 'jpeg'] else ext
     if ext is not None:
         if not filename.endswith(ext):
             filename = filename + ext 
-            return filename
+        return filename
     ext = imghdr.what(filename)
     ext = 'jpg' if ext == 'jpeg' else ext
     if ext is not None:
         if not filename.endswith('.' + ext):
             filename = filename + '.' + ext
-            return filename
+        return filename
     raise TypeError('Invalid image type.')
 
 def download_image(url, dir, get_image_url=True):
