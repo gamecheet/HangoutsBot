@@ -574,9 +574,10 @@ def download_image(url, dir, get_image_url=True):
         newfilename = get_proper_filename(filename, content_type)
         if newfilename != filename:
             os.rename(filename, newfilename)
+            filename = newfilename
     except error.HTTPError as e:
         print(e.fp.read())
-    return newfilename
+    return filename
 
 def upload_image(bot, filename):
     with open(filename, 'rb') as f:
