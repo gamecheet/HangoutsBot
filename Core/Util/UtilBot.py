@@ -527,6 +527,23 @@ def get_image_url(url):
             print(e)
     return url
 
+def get_proper_filename(filename, content_type=None):
+    filename = filename.partition('?')[0]
+
+    ext = None
+    if content_type:
+        ext = mimetypes.guess_extension(content_type)
+    if ext is not None:
+        if not filename.endswith(ext):
+            filename = filename + ext 
+            return filename
+    ext = imghdr.what(filename)
+    if ext is not None:
+        if not filename.endswith('.' + ext):
+            filename = filename + '.' + ext
+            return filename
+    raise TypeError('Invalid image type.')
+
 def download_image(url, dir, get_image_url=True):
     if get_image_url:
         url = get_image_url(url)
@@ -546,27 +563,15 @@ def download_image(url, dir, get_image_url=True):
     else:
         filename = os.path.join(dir, os.path.basename(url))
         filename = filename.partition('?')[0]
-        ext = mimetypes.guess_extension(content_type)
-        if ext is None:
-            rename_later = True
-        else:
-            if not filename.endswith(ext):
-                filename = filename + ext
     os.makedirs(dir, exist_ok=True)
     try:
         # TODO: switch to requests library
         req = request.urlopen(request.Request(url, headers=request_headers))
         with open(filename, 'wb') as fp:
             shutil.copyfileobj(req, fp)
-        if rename_later:
-            ext = imghdr.what(filename)
-            if ext is None:
-                raise TypeError('Invalid image type.')
-            else:
-                if not filename.endswith('.' + ext):
-                    oldfilename = filename
-                    filename = filename + '.' + ext
-                    os.rename(oldfilename, filename)
+        newfilename = get_proper_filename(filename, content_type)
+        if newfilename != filename:
+            os.rename(filname, newfilename)
     except error.HTTPError as e:
         print(e.fp.read())
     return filename
