@@ -533,11 +533,13 @@ def get_proper_filename(filename, content_type=None):
     ext = None
     if content_type:
         ext = mimetypes.guess_extension(content_type)
+        ext = 'jpg' if ext == 'jpeg' else ext
     if ext is not None:
         if not filename.endswith(ext):
             filename = filename + ext 
             return filename
     ext = imghdr.what(filename)
+    ext = 'jpg' if ext == 'jpeg' else ext
     if ext is not None:
         if not filename.endswith('.' + ext):
             filename = filename + '.' + ext
@@ -571,10 +573,10 @@ def download_image(url, dir, get_image_url=True):
             shutil.copyfileobj(req, fp)
         newfilename = get_proper_filename(filename, content_type)
         if newfilename != filename:
-            os.rename(filname, newfilename)
+            os.rename(filename, newfilename)
     except error.HTTPError as e:
         print(e.fp.read())
-    return filename
+    return newfilename
 
 def upload_image(bot, filename):
     with open(filename, 'rb') as f:
