@@ -529,10 +529,10 @@ def get_image_url(url):
 
 def download_image(url, dir, get_image_url=True):
     if get_image_url:
-        get_image_url(url)
+        url = get_image_url(url)
     headers = requests.head(url, allow_redirects=True).headers
     content_type = headers.get('content-type').partition(';')[0]
-        
+
     rename_later = False
     if 'content-disposition' in headers.keys():
         filename = headers['content-disposition'].split('filename=')[-1].replace('"','').replace(';','')
@@ -543,7 +543,7 @@ def download_image(url, dir, get_image_url=True):
         if ext is None:
             rename_later = True
         else:
-            if filename[-4:] != ext:
+            if not filename.endswith(ext):
                 filename = filename + ext
     os.makedirs(dir, exist_ok=True)
     try:
@@ -556,7 +556,7 @@ def download_image(url, dir, get_image_url=True):
             if ext is None:
                 raise TypeError('Invalid image type.')
             else:
-                if filename[-4:] != ('.' + ext):
+                if not filename.endswith('.' + ext):
                     oldfilename = filename
                     filename = filename + '.' + ext
                     os.rename(oldfilename, filename)
