@@ -531,13 +531,13 @@ def get_proper_filename(filename, content_type=None):
     filename = filename.partition('?')[0]
 
     ext = None
-    if content_type:
-        ext = mimetypes.guess_extension(content_type)
-        ext = 'jpg' if ext in ['jpe', 'jpeg'] else ext
-    if ext is not None:
-        if not filename.endswith(ext):
-            filename = filename + ext 
-        return filename
+#    if content_type:
+#        ext = mimetypes.guess_extension(content_type)
+#        ext = 'jpg' if ext in ['jpe', 'jpeg'] else ext
+#    if ext is not None:
+#        if not filename.endswith(ext):
+#            filename = filename + ext 
+#        return filename
     ext = imghdr.what(filename)
     ext = 'jpg' if ext == 'jpeg' else ext
     if ext is not None:
