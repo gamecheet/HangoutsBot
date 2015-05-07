@@ -514,8 +514,15 @@ def text_to_segments(text):
     return segments
 
 def get_image_url(url):
-    headers = requests.head(url).headers
+    user_agent = ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 '
+                  '(KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 '
+                  'Chrome/18.0.1025.168 Safari/535.19')
+    request_headers = {'accept-encoding': 'gzip, deflate',
+                       'user-agent': user_agent}
+
+    headers = requests.head(url, allow_redirects=True, headers=request_headers).headers
     content_type = headers.get('content-type').partition(';')[0]
+
     if content_type == 'text/html':
         try:
             soup = BeautifulSoup(request.urlopen(url))
