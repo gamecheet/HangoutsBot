@@ -567,10 +567,10 @@ def download_image(url, dir, get_image_url=True):
         filename = filename.partition('?')[0]
     os.makedirs(dir, exist_ok=True)
     try:
-        # TODO: switch to requests library
-        req = request.urlopen(request.Request(url, headers=request_headers))
+        req = requests.get(url, headers=request_headers, stream=True)
         with open(filename, 'wb') as fp:
-            shutil.copyfileobj(req, fp)
+            req.raw.decode_content = True
+            shutil.copyfileobj(req.raw, fp)
         newfilename = get_proper_filename(filename, content_type)
         if newfilename != filename:
             os.rename(filename, newfilename)
