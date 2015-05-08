@@ -588,7 +588,11 @@ def download_image(url, dir, get_image_url=True):
         with open(filename, 'wb') as fp:
             req.raw.decode_content = True
             shutil.copyfileobj(req.raw, fp)
-        newfilename = get_proper_filename(filename, content_type)
+        try:
+            newfilename = get_proper_filename(filename, content_type)
+        except TypeError as e:
+            print(url)
+            raise e
         if newfilename != filename:
             os.rename(filename, newfilename)
             filename = newfilename
