@@ -534,7 +534,17 @@ def get_image_url(url):
             print(e)
     return url
 
+def test_jpeg(h, f):    
+    if ((h[6:10] in [b'JFIF', b'Exif'])
+        or (h[:2] == b'\xff\xd8'
+            and (b'JFIF' in h[:32]
+                 or b'8BIM' in h[:32]
+                 or h[2:4] == b'\xff\xdb'))):
+        return 'jpeg'
+
 def get_proper_filename(filename, content_type=None):
+    imghdr.tests.append(test_jpeg)
+
     filename = filename.partition('?')[0]
 
     ext = None
