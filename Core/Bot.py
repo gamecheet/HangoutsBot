@@ -256,8 +256,11 @@ class HangoutsBot(object):
 
     # DEPRECATED
     def send_image(self, conversation, image_id, text=None):
+        segments = []
+        if text:
+            segments.append(hangups.ChatMessageSegment(text))
         asyncio.async(
-            conversation.send_message([hangups.ChatMessageSegment(text)], image_id=image_id)
+            conversation.send_message(segments, image_id=image_id)
         ).add_done_callback(self._on_message_sent)
 
     def list_conversations(self):

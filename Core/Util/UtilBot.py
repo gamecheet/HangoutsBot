@@ -523,6 +523,8 @@ def get_image_info(url):
     headers = requests.head(url, allow_redirects=True, headers=request_headers).headers
     content_type = headers.get('content-type').partition(';')[0]
 
+    desc = None
+
     if content_type == 'text/html':
         try:
             soup = BeautifulSoup(request.urlopen(url))
