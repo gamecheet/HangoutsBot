@@ -185,8 +185,10 @@ def img(bot, event, *args):
                print(str(e))
                file_exception = True
             imageID = None;
+        desc = None
         if imageID is None:
-            url = UtilBot.get_image_url(url)
+            image_info = UtilBot.get_image_info(url)
+            url, desc = image_info
             filename = UtilBot.download_image(url, 'images', False)
             imageID = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
@@ -194,7 +196,8 @@ def img(bot, event, *args):
                 with open(imageids_filename, 'w') as f:
                     json.dump(imageids, f, indent=2, sort_keys=True)
                 os.remove(filename)
-        bot.send_image(event.conv, imageID)
+        # TODO: switch to send_message_segments
+        bot.send_image(event.conv, imageID, desc)
 
 @DispatcherSingleton.register
 def log(bot, event, *args):

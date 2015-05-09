@@ -513,7 +513,7 @@ def text_to_segments(text):
 
     return segments
 
-def get_image_url(url):
+def get_image_info(url):
     user_agent = ('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.19 '
                   '(KHTML, like Gecko) Ubuntu/12.04 Chromium/18.0.1025.168 '
                   'Chrome/18.0.1025.168 Safari/535.19')
@@ -530,9 +530,10 @@ def get_image_url(url):
             # for imgur, don't use the FB thumbnail
             if 'imgur' in url and '?fb' in url:
                 url = url[:-3]
+            desc = soup.find(property='og:description')['content']
         except Exception as e:
             print(e)
-    return url
+    return (url, desc)
 
 def test_jpeg(h, f):    
     if ((h[6:10] in [b'JFIF', b'Exif'])
