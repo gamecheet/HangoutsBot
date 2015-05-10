@@ -528,14 +528,18 @@ def get_image_info(url):
     if content_type == 'text/html':
         try:
             soup = BeautifulSoup(request.urlopen(url))
+            orig_url = url
             url = soup.find(property='og:image')['content']
             # for imgur, don't use the FB thumbnail
             if 'imgur' in url and '?fb' in url:
                 url = url[:-3]
-            no_desc_sites = ['i.gyazo.com']
-            print(url.split('/')[2])
-            if url.split('/')[2] not in no_desc_sites:
+            desc_sites = ['instagram.com']
+            title_sites = ['imgur.com']
+            domain = orig_url.split('/')[2]
+            if domain in desc_sites:
                 desc = soup.find(property='og:description')['content']
+            elif domain in title_sites:
+                desc = soup.find(property='og:title')['content']
         except Exception as e:
             print(e)
     return (url, desc)
