@@ -243,7 +243,8 @@ class HangoutsBot(object):
         """"Send simple chat message"""
         self.send_message_segments(conversation, [hangups.ChatMessageSegment(text)])
 
-    def send_message_segments(self, conversation, segments):
+    def send_message_segments(self, conversation, segments,
+                              image_id=None):
         """Send chat message segments"""
         # Ignore if the user hasn't typed a message.
         if len(segments) == 0:
@@ -251,7 +252,7 @@ class HangoutsBot(object):
         # XXX: Exception handling here is still a bit broken. Uncaught
         # exceptions in _on_message_sent will only be logged.
         asyncio.async(
-            conversation.send_message(segments)
+            conversation.send_message(segments, image_id=image_id)
         ).add_done_callback(self._on_message_sent)
 
     # DEPRECATED
