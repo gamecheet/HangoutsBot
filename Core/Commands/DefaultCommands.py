@@ -1,3 +1,4 @@
+import html.parser
 import json
 from urllib import parse
 from urllib import request
@@ -31,7 +32,11 @@ def think(bot, event, *args):
     if clever_session is None:
         clever_sessions[event.user.id_.chat_id] = ChatterBotFactory().create(ChatterBotType.CLEVERBOT).create_session()
         clever_session = clever_sessions[event.user.id_.chat_id]
-    bot.send_message(event.conv, clever_session.think(' '.join(args)))
+    message = clever_session.think(' '.join(args))
+    message = re.sub(r'\|(([0-9]|[A-Z]){4})', r'\\u\1', message)
+    message = bytes(message, 'ascii').decode('unicode-escape')
+    message = html.unescape(message)
+    bot.send_message(event.conv, message)
 
 
 @DispatcherSingleton.register
