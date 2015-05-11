@@ -189,6 +189,8 @@ def img(bot, event, *args):
         if imageID is None:
             image_info = UtilBot.get_image_info(url)
             url, desc = image_info
+            if desc is None:
+                desc = ' '.join(args[1:])
             filename = UtilBot.download_image(url, 'images', False)
             imageID = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
