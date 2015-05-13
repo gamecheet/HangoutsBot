@@ -520,7 +520,9 @@ def get_image_info(url):
     request_headers = {'accept-encoding': 'gzip, deflate',
                        'user-agent': user_agent}
 
-    headers = requests.head(url, allow_redirects=True, headers=request_headers).headers
+    headers = requests.head(url, allow_redirects=True,
+                            headers=request_headers, verify=False
+                           ).headers
     content_type = headers.get('content-type').partition(';')[0]
 
     desc = None
@@ -583,7 +585,9 @@ def download_image(url, dir, get_image_url=True):
     request_headers = {'accept-encoding': 'gzip, deflate',
                        'user-agent': user_agent}
 
-    headers = requests.head(url, allow_redirects=True, headers=request_headers).headers
+    headers = requests.head(url, allow_redirects=True,
+                            headers=request_headers, verify=False
+                           ).headers
     content_type = headers.get('content-type').partition(';')[0]
 
     rename_later = False
@@ -594,7 +598,8 @@ def download_image(url, dir, get_image_url=True):
         filename = filename.partition('?')[0]
     os.makedirs(dir, exist_ok=True)
     try:
-        req = requests.get(url, headers=request_headers, stream=True)
+        req = requests.get(url, headers=request_headers,
+                           stream=True, verify=False)
         with open(filename, 'wb') as fp:
             req.raw.decode_content = True
             shutil.copyfileobj(req.raw, fp)
