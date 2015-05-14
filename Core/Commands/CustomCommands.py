@@ -152,8 +152,10 @@ def img(bot, event, *args):
         aliases[alias] = url
         bot.send_message(event.conv, "Alias {alias} saved with URL {url}".format(alias=alias,url=url))
         save_json('image_aliases.json', aliases)
+#no special arguments
     elif len(args) > 0:
         url = args[0]
+        is_alias = False
         alias = ''.join(args)
         # strip spaces and non-alphanumeric characters
         alias = ''.join(filter(str.isalnum, alias))
@@ -164,8 +166,10 @@ def img(bot, event, *args):
         if alias_url is not None:
             if isinstance(alias_url, str):
                 url = alias_url
+                is_alias = True
             elif isinstance(alias_url, list):
                 url = random.choice(alias_url)
+                is_alias = True
             else:
                 print("Error: alias points to neither list nor string")
         if not is_valid_url(url):
@@ -186,11 +190,11 @@ def img(bot, event, *args):
                file_exception = True
             imageID = None;
         desc = None
+        image_info = UtilBot.get_image_info(url)
+        url, desc = image_info
+        if desc is None and not is_alias:
+            desc = ' '.join(args[1:])
         if imageID is None:
-            image_info = UtilBot.get_image_info(url)
-            url, desc = image_info
-            if desc is None:
-                desc = ' '.join(args[1:])
             filename = UtilBot.download_image(url, 'images', False)
             imageID = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
