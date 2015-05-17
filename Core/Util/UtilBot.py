@@ -555,6 +555,11 @@ def test_jpeg(h, f):
         return 'jpeg'
 
 def get_proper_filename(filename, content_type=None):
+    if filename[-4:] in ['.jpg', '.gif', '.png']:
+        return filename
+    if filename[-5:] == '.jpeg':
+        return filename
+
     imghdr.tests.append(test_jpeg)
 
     filename = filename.partition('?')[0]
