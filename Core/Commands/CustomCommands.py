@@ -709,6 +709,10 @@ def imagesearch(bot, event, *args):
         result = response.content.decode()
         result_list = json.loads(result)
         image_url = result_list['items'][num_requested]['link']
+        if not is_valid_url(image_url):
+            image_url = 'http://' + image_url
+            if not is_valid_url(image_url):
+                image_url = result_list['items'][num_requested]['image']['thumbnailLink']
         args = [image_url]
         yield from img(bot, event, *args)
     except error.HTTPError as e:
