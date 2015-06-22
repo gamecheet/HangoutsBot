@@ -21,6 +21,10 @@ from .fliptextdict import fliptextdict
 def me(bot, event, *args):
     pass
 
+@DispatcherSingleton.register
+def s(bot, event, *args):
+    pass
+
 @DispatcherSingleton.register_hidden
 def load_ezhiks(bot, event, *args):
     file_exception = False
