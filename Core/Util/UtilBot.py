@@ -601,6 +601,11 @@ def download_image(url, dir, get_image_url=True):
     else:
         filename = os.path.join(dir, os.path.basename(url))
         filename = filename.partition('?')[0]
+    if filename == os.path.join(dir, ''):
+        filename = 'download'
+        ext = mimetypes.guess_extension(content_type)
+        ext = 'jpg' if ext in ['jpe', 'jpeg'] else ext
+        filename = filename + ext
     os.makedirs(dir, exist_ok=True)
     try:
         req = requests.get(url, headers=request_headers,
