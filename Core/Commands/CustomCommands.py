@@ -542,6 +542,8 @@ from selenium import webdriver
 def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
     filename = 'screenie.png'
 
+    cliprectsize = '0x0x' + viewportsize;
+
     try:
         cmd = ['capturejs',
                '--uri',
@@ -549,7 +551,9 @@ def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
                '--viewportsize',
                viewportsize,
                '--output',
-               filename]
+               filename,
+               '--cliprect',
+               cliprectsize]
 
         output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         output = output.decode(encoding='UTF-8')
