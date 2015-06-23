@@ -227,7 +227,10 @@ Purpose: Finish a lyric!
             except Exception:
                 pass
         next = UtilBot.find_next_non_blank(lyrics, currmin[0])
-        chopped = lyrics[currmin[0]][1]
+        if len(lyrics[currmin[0]][0]) == 1:
+            chopped = ""
+        else:
+            chopped = lyrics[currmin[0]][1]
         found_lyric = lyrics[currmin[0]][0] + " " + lyrics[next][0] if chopped else lyrics[next][0]
         if found_lyric.startswith('['):
             found_lyric = anchors[found_lyric]
