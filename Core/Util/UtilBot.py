@@ -2,6 +2,7 @@ from bisect import bisect_left
 import os
 from urllib import parse, request, error
 from bs4 import BeautifulSoup, Tag
+import json
 import re
 import requests
 import shutil
@@ -535,10 +536,17 @@ def get_image_info(url):
             # for imgur, don't use the FB thumbnail
             if 'imgur' in url and '?fb' in url:
                 url = url[:-3]
-            desc_sites = ['instagram.com']
+            desc_sites = []
             title_sites = ['imgur.com']
             domain = orig_url.split('/')[2]
-            if domain in desc_sites:
+            if domain == 'instagram.com':
+                json_string = soup.find('script', text=re.compile("window._sharedData")).string
+                i_first_brace = json_string.index('{')
+                i_last_brace = json_string.rindex('}')+1
+                json_string = json_string[i_first_brace:i_last_brace]
+                json_obj = json.loads(json_string)
+                desc = json_obj['entry_data']['PostPage'][0]['media']['caption']
+            elif domain in desc_sites:
                 desc = soup.find(property='og:description')['content']
             elif domain in title_sites:
                 desc = soup.find(property='og:title')['content']
