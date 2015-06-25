@@ -131,7 +131,6 @@ def image(bot, event, *args):
 def img(bot, event, *args):
     if len(args) > 0 and args[0] == 'list':
         aliases = UtilDB.get_list_of_aliases()
-        #aliases = load_json('image_aliases.json')
         segments = []
         for alias in aliases:
             segments.append(hangups.ChatMessageSegment(alias))
@@ -141,23 +140,21 @@ def img(bot, event, *args):
         if len(args) < 3:
            bot.send_message(event.conv, "Error: not enough arguments")
            return
-        aliases = load_json('image_aliases.json')
         # alias is all arguments except the first and last
         alias = ''.join(args[1:len(args)-1])
         # strip spaces and non-alphanumeric characters
         alias = ''.join(filter(str.isalnum, alias))
         alias = alias.lower()
         url = args[len(args)-1]
-        if aliases.get(alias) is not None:
+        if UtilDB.get_urls_for_alias(alias) is not None:
             bot.send_message(event.conv, "Error: that alias already exists")
             return
         print(str(is_valid_url(url)))
         if not is_valid_url(url):
             bot.send_message(event.conv, "Error: invalid URL")
             return
-        aliases[alias] = url
+        UtilDB.set_alias_for_url(url, alias)
         bot.send_message(event.conv, "Alias {alias} saved with URL {url}".format(alias=alias,url=url))
-        save_json('image_aliases.json', aliases)
 #no special arguments
     elif len(args) > 0:
         url = args[0]
