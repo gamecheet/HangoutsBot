@@ -72,7 +72,9 @@ def ezhik(bot, event, *args):
     if image_id is None:
         print('Exception: ezhik not found (this should never happen!)')
     else:
-        bot.send_image(event.conv, image_id)
+        bot.send_message_segments(event.conv,
+            None,
+            image_id)
 
 def load_json(filename):
     try:
