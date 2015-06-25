@@ -273,30 +273,7 @@ def set_imageid_for_url(url, google_id):
 def set_imageid_for_filename(filename, google_id):
     set_imageid_for_column('filename', filename, google_id)
 
-def set_alias_for_url(url, alias):
-    if _database_file:
-        database = sqlite3.connect(_database_file)
-        cursor = database.cursor()
-
-        cursor.execute("INSERT INTO alias(alias) VALUES (?)", (alias,))
-        alias_row_id = cursor.lastrowid
-
-        cursor.execute('''\
-INSERT INTO image(url)
-SELECT ?
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE url = ?)
-''', (url, url))
-
-        cursor.execute('''\
-INSERT INTO xref_image_alias(image_id, alias_id)
-SELECT image.id, ?
-FROM   image
-WHERE  image.url = ?
-''', (alias_row_id, url))
-
-        database.commit()
-
-def set_alias_for_filename(filename, alias):
+def set_alias_for_column(column, column_data, alias):
     if _database_file:
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
@@ -307,23 +284,27 @@ SELECT ?
 WHERE NOT EXISTS (SELECT 1 FROM alias WHERE alias = ?)
 ''', (alias, alias))
 
-        alias_row_id = cursor.lastrowid
-
         cursor.execute('''\
-INSERT INTO image(filename)
+INSERT INTO image({})
 SELECT ?
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE filename = ?)
-''', (filename, filename))
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE {} = ?)
+'''.format(column, column), (column_data, column_data))
 
         try:
             cursor.execute('''\
 INSERT INTO xref_image_alias(image_id, alias_id)
 SELECT image.id, (SELECT id FROM alias WHERE alias = ?)
 FROM   image
-WHERE  image.filename = ?
-''', (alias, filename))
+WHERE  image.{} = ?
+'''.format(column), (alias, column_data))
         except sqlite3.IntegrityError:
             pass
 
         database.commit()
+
+def set_alias_for_url(url, alias):
+    set_alias_for_column('url', url, alias)
+
+def set_alias_for_filename(filename, alias):
+    set_alias_for_column('filename', filename, alias)
 
