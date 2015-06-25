@@ -184,9 +184,6 @@ def img(bot, event, *args):
             filename = UtilBot.download_image(url, 'images', False)
             image_id = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
-                #imageids[url] = image_id
-                #with open(imageids_filename, 'w') as f:
-                #    json.dump(imageids, f, indent=2, sort_keys=True)
                 UtilDB.set_imageid_for_url(url, image_id)
                 os.remove(filename)
         # TODO: switch to send_message_segments
