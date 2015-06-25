@@ -27,18 +27,23 @@ def s(bot, event, *args):
     pass
 
 @DispatcherSingleton.register
-def load_ezhiks(bot, event, *args):
-    # loop through ezhiks folder
-    for filename in glob(os.path.join('ezhiks', '*')):
+def load_images_from_folder(bot, event, *args):
+    folder = args[0]
+    # loop through folder
+    for filename in glob(os.path.join('images', folder, '*')):
         # if filename not in imageids, upload it and store filename,id
-        filekey = os.path.split(filename)[1]
+        filetail = os.path.split(filename)[1]
+        filehead = os.path.split(os.path.split(filename)[0])[1]
+        filekey = os.path.join(filehead, filetail)
+        print(filekey)
         image_id = UtilDB.get_imageid_for_filename(filekey)
         if image_id is None:
-            bot.send_message(event.conv, "Uploading ezhik: " + filekey)
+            bot.send_message(event.conv,
+                             "Uploading {}".format(filekey))
             image_id = yield from UtilBot.upload_image(bot, filename)
             UtilDB.set_imageid_for_filename(filekey, image_id)
             ####os.remove(filename)
-        UtilDB.set_alias_for_filename(filekey, 'ezhik')
+        UtilDB.set_alias_for_filename(filekey, folder)
     bot.send_message(event.conv, "Done.")
 
 @DispatcherSingleton.register
