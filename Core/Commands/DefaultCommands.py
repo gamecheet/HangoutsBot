@@ -784,9 +784,9 @@ def gif(bot, event, *args):
             num_requested = int(args[-1][1:]) - 1
             args = args[:-1]
 
-    if num_requested > 9 or num_requested < 0:
+    if num_requested > 7 or num_requested < 0:
         bot.send_message(event.conv,
-                         "Error: result number must be between 1 and 10.")
+                         "Error: result number must be between 1 and 8.")
         return
 
     query = ' '.join(args)
