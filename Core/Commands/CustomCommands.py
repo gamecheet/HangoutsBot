@@ -2,6 +2,7 @@ import asyncio
 import http.client
 from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Util import UtilBot
+from Core.Util import UtilDB
 import hangups
 import urllib
 from urllib import parse, request, error
@@ -43,11 +44,11 @@ def load_ezhiks(bot, event, *args):
     for filename in glob(os.path.join('ezhiks', '*')):
         # if filename not in imageids, upload it and store filename,id
         filekey = os.path.split(filename)[1]
-        imageID = imageids.get(filekey)
-        if imageID is None:
-            imageID = yield from UtilBot.upload_image(bot, filename)
+        image_id = imageids.get(filekey)
+        if image_id is None:
+            image_id = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
-                imageids[filekey] = imageID
+                imageids[filekey] = image_id
                 with open(imageids_filename, 'w') as f:
                     json.dump(imageids, f, indent=2, sort_keys=True)
                 os.remove(filename)
@@ -67,11 +68,11 @@ def ezhik(bot, event, *args):
            print(str(e))
            file_exception = True
         return
-    imageID = imageids.get(random.choice(list(imageids.keys())))
-    if imageID is None:
+    image_id = imageids.get(random.choice(list(imageids.keys())))
+    if image_id is None:
         print('Exception: ezhik not found (this should never happen!)')
     else:
-        bot.send_image(event.conv, imageID)
+        bot.send_image(event.conv, image_id)
 
 def load_json(filename):
     try:
@@ -111,13 +112,13 @@ def load_aliased_images(bot, event, *args):
         for url in v if not isinstance(v, str) else [v]:
             print('URL = ' + url)
             # if url is not in imageids, upload it and store filename,id
-            imageID = imageids.get(url)
-            if imageID is None:
+            image_id = imageids.get(url)
+            if image_id is None:
                 print('URL = ' + url)
                 filename = UtilBot.download_image(url, 'images')
-                imageID = yield from UtilBot.upload_image(bot, filename)
+                image_id = yield from UtilBot.upload_image(bot, filename)
                 if not file_exception:
-                    imageids[url] = imageID
+                    imageids[url] = image_id
                     with open(imageids_filename, 'w') as f:
                         json.dump(imageids, f, indent=2, sort_keys=True)
                     os.remove(filename)
@@ -165,51 +166,35 @@ def img(bot, event, *args):
         alias = ''.join(filter(str.isalnum, alias))
         alias = alias.lower()
         file_exception = False
-        aliases = load_json('image_aliases.json')
-        alias_url = aliases.get(alias)
-        if alias_url is not None:
-            if isinstance(alias_url, str):
-                url = alias_url
-                is_alias = True
-            elif isinstance(alias_url, list):
-                url = random.choice(alias_url)
-                is_alias = True
-            else:
-                print("Error: alias points to neither list nor string")
+        alias_url_list = UtilDB.get_urls_for_alias(alias)
+        if alias_url_list is not None:
+            url = random.choice(alias_url_list)
+            is_alias = True
         if not is_valid_url(url):
             url = 'http://' + url
             if not is_valid_url(url):
                 bot.send_message(event.conv, "Error: invalid alias or URL.")
                 return            
-        try:
-            imageids_filename = 'imageids.json'
-            imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
-            imageID = imageids.get(url)
-        except IOError as e:
-            if e.errno == errno.ENOENT:
-                imageids = {}
-            else:
-               print('Exception:')
-               print(str(e))
-               file_exception = True
-            imageID = None;
+        image_id = UtilDB.get_imageid_for_url(url)
+        print(image_id)
         desc = None
         image_info = UtilBot.get_image_info(url)
         url, desc = image_info
         if desc is None and not is_alias:
             desc = ' '.join(args[1:])
-        if imageID is None:
+        if image_id is None:
             filename = UtilBot.download_image(url, 'images', False)
-            imageID = yield from UtilBot.upload_image(bot, filename)
+            image_id = yield from UtilBot.upload_image(bot, filename)
             if not file_exception:
-                imageids[url] = imageID
-                with open(imageids_filename, 'w') as f:
-                    json.dump(imageids, f, indent=2, sort_keys=True)
+                #imageids[url] = image_id
+                #with open(imageids_filename, 'w') as f:
+                #    json.dump(imageids, f, indent=2, sort_keys=True)
+                UtilDB.set_imageid_for_url(url, image_id)
                 os.remove(filename)
         # TODO: switch to send_message_segments
         bot.send_message_segments(event.conv,
             [hangups.ChatMessageSegment(desc)] if desc else None,
-            imageID)
+            image_id)
 
 @DispatcherSingleton.register
 def log(bot, event, *args):
@@ -470,8 +455,8 @@ Purpose: Renders LaTeX code to an image and sends it
         print(output)
         filename = output[1:33] + '.png'
         filename = os.path.join('images', filename)
-        imageID = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, imageID)
+        image_id = yield from UtilBot.upload_image(bot, filename)
+        bot.send_image(event.conv, image_id)
 
 @DispatcherSingleton.register
 def greentext(bot, event, *args):
@@ -505,8 +490,8 @@ def greentext(bot, event, *args):
         output = output.decode(encoding='UTF-8')
         if output != '':
             bot.send_message(event.conv, output)
-        imageID = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, imageID)
+        image_id = yield from UtilBot.upload_image(bot, filename)
+        bot.send_image(event.conv, image_id)
         os.remove(filename)
     except subprocess.CalledProcessError as e:
         output = e.output.decode(encoding='UTF-8')
@@ -530,8 +515,8 @@ def color(bot, event, *args):
         output = output.decode(encoding='UTF-8')
         if output != '':
             bot.send_message(event.conv, output)
-        imageID = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, imageID)
+        image_id = yield from UtilBot.upload_image(bot, filename)
+        bot.send_image(event.conv, image_id)
         os.remove(filename)
     except subprocess.CalledProcessError as e:
         output = e.output.decode(encoding='UTF-8')
@@ -562,8 +547,8 @@ def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
         if output != '':
             bot.send_message(event.conv, output)
 
-        imageID = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, imageID)
+        image_id = yield from UtilBot.upload_image(bot, filename)
+        bot.send_image(event.conv, image_id)
         os.remove(filename)
     except http.client.BadStatusLine as e:
         display.stop()

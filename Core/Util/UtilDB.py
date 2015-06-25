@@ -32,13 +32,13 @@ def _init_tables():
         reminders_def = "CREATE TABLE reminders (conv_id text, message text, timestamp integer)"
         _init_table('reminders', reminders_def, cursor)
 
-        group_def = '''\
-CREATE TABLE group (
+        image_group_def = '''\
+CREATE TABLE image_group (
   id        INTEGER PRIMARY KEY ASC,
   name      TEXT
 )
 '''
-        _init_table('group', group_def, cursor)
+        _init_table('image_group', image_group_def, cursor)
 
         alias_def = '''\
 CREATE TABLE alias (
@@ -53,21 +53,24 @@ CREATE TABLE image (
   id        INTEGER PRIMARY KEY ASC,
   url       TEXT,
   filename  TEXT,
-  google_id TEXT
-  FOREIGN KEY(group_id) REFERENCES group(id)
+  google_id TEXT,
+  group_id  INTEGER,
+  FOREIGN KEY(group_id) REFERENCES image_group(id)
 );
 '''
         _init_table('image', image_def, cursor)
 
-        image_alias_def = '''\
-CREATE TABLE image_alias (
+        xref_image_alias_def = '''\
+CREATE TABLE xref_image_alias (
   id        INTEGER PRIMARY KEY ASC,
+  image_id  INTEGER,
+  alias_id  INTEGER,
   FOREIGN KEY(image_id) REFERENCES image(id),
   FOREIGN KEY(alias_id) REFERENCES alias(id)
 )
 '''
 
-        _init_table('image_alias', image_alias_def, cursor)
+        _init_table('xref_image_alias', xref_image_alias_def, cursor)
 
         database.commit()
         cursor.close()
@@ -128,5 +131,102 @@ def set_value_by_user_id(table, user_id, keyword, value, conv_id=None):
 def get_database():
     return _database_file
 
+def get_row_dict(table, id):
+    con = sqlite3.connect(_database_file)
+    with con:
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        cur.execute("SELECT * FROM %s WHERE id = ?" % table, id)
+        row = cur.fecthone()
+    return row
 
+def get_image(id):
+    return get_row_dict('image', id)
+
+def insert_row_dict(dict):
+    con = sqlite3.connect(_database_file)
+#    with con:
+#        con.execute("INSERT INTO %s
+
+class Image:
+    def __init__(self, id=None):
+        if id:
+            self.id = id
+            if _database_file:
+                database = sqlite3.connect(_database_file)
+                cursor = database.cursor()
+                table = 'image'
+                cursor.execute("SELECT * FROM %s WHERE id = ?" % table, id)
+                image = cursor.fetchone()
+                self.url = image['url']
+                self.filename = image['filename']
+                #self.group = 
+
+            else:
+                raise DatabaseNotInitializedError()
+        else:
+            self.id = None
+
+    def update():
+        if _database_file:
+            database = sqlite3.connect(_database_file)
+            cursor = database.cursor()
+            cursor.execute("UPDATE image SET url = ?, filename = ?, google_id = ? WHERE id = ?", (url, filename, google_id))
+            database.commit()
+        else:
+            raise DatabaseNotInitializedError()
+
+    def insert():
+        if _database_file:
+            database = sqlite3.connect(_database_file)
+            cursor = database.cursor()
+            cursor.execute("INSERT INTO image (url, filename, google_id) VALUES (?, ?, ?)", (url, filename, google_id))
+            database.commit()
+        else:
+            raise DatabaseNotInitializedError()
+
+def get_urls_for_alias(alias):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute("""\
+SELECT image.url
+FROM xref_image_alias
+JOIN image ON xref_image_alias.image_id = image.id
+JOIN alias ON xref_image_alias.alias_id = alias.id
+WHERE alias.alias = ?
+""", (alias,))
+        result = cursor.fetchall()
+        if result is None or not result:
+            return None
+        else:
+            return [x[0] for x in result]
+
+def get_imageid_for_url(url):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute("""\
+SELECT google_id
+FROM image
+WHERE url = ?
+""", (url,))
+        result = cursor.fetchone()
+        return result[0]
+        #return None if result is None else result[0]
+
+def set_imageid_for_url(url, google_id):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute("""\
+UPDATE image
+SET google_id = ?
+WHERE url = ?
+""", (google_id, url))
+
+        database.commit()
 
