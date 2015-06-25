@@ -248,43 +248,30 @@ def get_imageid_for_url(url):
 def get_imageid_for_filename(filename):
     return get_imageid_for_filename('filename', filename)
 
-def set_imageid_for_url(url, google_id):
+def set_imageid_for_column(column, column_data, google_id):
     if _database_file:
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
 
         cursor.execute('''\
-INSERT INTO image(url)
+INSERT INTO image({})
 SELECT ?
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE url = ?)
-''', (url, url))
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE {} = ?)
+'''.format(column, column), (column_data, column_data))
 
         cursor.execute("""\
 UPDATE image
 SET google_id = ?
-WHERE url = ?
-""", (google_id, url))
+WHERE {} = ?
+""".format(column), (google_id, column_data))
 
         database.commit()
+
+def set_imageid_for_url(url, google_id):
+    set_imageid_for_column('url', url, google_id)
 
 def set_imageid_for_filename(filename, google_id):
-    if _database_file:
-        database = sqlite3.connect(_database_file)
-        cursor = database.cursor()
-
-        cursor.execute('''\
-INSERT INTO image(filename)
-SELECT ?
-WHERE NOT EXISTS (SELECT 1 FROM image WHERE filename = ?)
-''', (filename, filename))
-
-        cursor.execute("""\
-UPDATE image
-SET google_id = ?
-WHERE filename = ?
-""", (google_id, filename))
-
-        database.commit()
+    set_imageid_for_column('filename', filename, google_id)
 
 def set_alias_for_url(url, alias):
     if _database_file:
