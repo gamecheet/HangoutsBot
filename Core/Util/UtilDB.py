@@ -1,7 +1,7 @@
 import sqlite3
 
 _database_file = None
-
+_imageids_db = 'image_ids.db'
 
 class DatabaseNotInitializedError(BaseException):
     pass
@@ -22,6 +22,17 @@ def _init_table(table_name, table_def, cursor):
         cursor.execute(table_def)
 
 def _init_tables():
+    imageids_db = sqlite3.connect(_imageids_db)
+    cursor = imageids_db.cursor()
+
+    image_id_def = '''\
+CREATE TABLE image_id (
+  db_id     INTEGER,
+  google_id TEXT
+)
+'''
+    _init_table('image_id', image_id_def, cursor)
+
     if _database_file:
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
