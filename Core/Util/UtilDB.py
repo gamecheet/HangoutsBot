@@ -182,9 +182,8 @@ def get_list_of_aliases():
         cursor = database.cursor()
 
         cursor.execute("""\
-SELECT alias.alias
-FROM xref_image_alias
-JOIN alias ON xref_image_alias.alias_id = alias.id;
+SELECT alias
+FROM alias
 """)
         result = cursor.fetchall()
         if result is None or not result:
