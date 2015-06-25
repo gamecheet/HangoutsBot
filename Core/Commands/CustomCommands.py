@@ -169,16 +169,23 @@ def img(bot, event, *args):
         if alias_url_list is not None:
             url = random.choice(alias_url_list)
             is_alias = True
+        image_id_list = UtilDB.get_imageids_for_alias(alias)
+        image_id = None
+        if image_id_list is not None:
+            image_id = random.choice(image_id_list)
+            is_alias = True
         if not is_valid_url(url):
             url = 'http://' + url
-            if not is_valid_url(url):
+            if not is_valid_url(url) and image_id is None:
                 bot.send_message(event.conv, "Error: invalid alias or URL.")
                 return            
-        image_id = UtilDB.get_imageid_for_url(url)
+        if image_id is None:
+            image_id = UtilDB.get_imageid_for_url(url)
         print(image_id)
         desc = None
-        image_info = UtilBot.get_image_info(url)
-        url, desc = image_info
+        if not is_alias:
+            image_info = UtilBot.get_image_info(url)
+            url, desc = image_info
         if desc is None and not is_alias:
             desc = ' '.join(args[1:])
         if image_id is None:
