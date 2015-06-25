@@ -163,7 +163,6 @@ def img(bot, event, *args):
         # strip spaces and non-alphanumeric characters
         alias = ''.join(filter(str.isalnum, alias))
         alias = alias.lower()
-        file_exception = False
         alias_url_list = UtilDB.get_urls_for_alias(alias)
         if alias_url_list is not None:
             url = random.choice(alias_url_list)
@@ -183,10 +182,8 @@ def img(bot, event, *args):
         if image_id is None:
             filename = UtilBot.download_image(url, 'images', False)
             image_id = yield from UtilBot.upload_image(bot, filename)
-            if not file_exception:
-                UtilDB.set_imageid_for_url(url, image_id)
-                os.remove(filename)
-        # TODO: switch to send_message_segments
+            UtilDB.set_imageid_for_url(url, image_id)
+            os.remove(filename)
         bot.send_message_segments(event.conv,
             [hangups.ChatMessageSegment(desc)] if desc else None,
             image_id)
