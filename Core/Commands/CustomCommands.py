@@ -207,7 +207,9 @@ def img(bot, event, *args):
                     json.dump(imageids, f, indent=2, sort_keys=True)
                 os.remove(filename)
         # TODO: switch to send_message_segments
-        bot.send_image(event.conv, imageID, desc)
+        bot.send_message_segments(event.conv,
+            [hangups.ChatMessageSegment(desc)] if desc else None,
+            imageID)
 
 @DispatcherSingleton.register
 def log(bot, event, *args):
