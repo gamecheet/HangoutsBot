@@ -1,7 +1,6 @@
 import os
 import json
 import sqlite3
-from Core.Util import UtilDB
 
 _database_file = 'database.db'
 
@@ -31,7 +30,13 @@ def migrate_image_aliases():
 
     for alias in sorted(aliases.keys()):
         print(alias)
-        cursor.execute("INSERT INTO alias(alias) VALUES (?)", (alias,))
+
+        cursor.execute('''\
+INSERT INTO alias(alias)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM alias WHERE alias = ?)
+''', (alias, alias))
+
         alias_row_id = cursor.lastrowid
 
         alias_list = aliases.get(alias)
@@ -104,6 +109,6 @@ WHERE  image.filename = ?
     database.close()
 
 
-#migrate_imageids()        
-#migrate_image_aliases()
+migrate_imageids()        
+migrate_image_aliases()
 migrate_ezhiks()
