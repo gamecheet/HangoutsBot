@@ -185,6 +185,22 @@ class Image:
         else:
             raise DatabaseNotInitializedError()
 
+def get_list_of_aliases():
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute("""\
+SELECT alias.alias
+FROM xref_image_alias
+JOIN alias ON xref_image_alias.alias_id = alias.id;
+""")
+        result = cursor.fetchall()
+        if result is None or not result:
+            return None
+        else:
+            return [x[0] for x in result]
+
 def get_urls_for_alias(alias):
     if _database_file:
         database = sqlite3.connect(_database_file)
