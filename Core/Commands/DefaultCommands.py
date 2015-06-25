@@ -1,3 +1,4 @@
+import html
 import asyncio
 import json
 from urllib import parse
@@ -31,7 +32,7 @@ def unknown_command(bot, event, *args):
                      '{}: Unknown command!'.format(event.user.full_name))
 
 
-@DispatcherSingleton.register_hidden
+@DispatcherSingleton.register
 def think(bot, event, *args):
     if not hasattr(think, "_clever_sessions"):
         think._clever_sessions = {}
