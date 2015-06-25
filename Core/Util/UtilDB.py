@@ -32,14 +32,6 @@ def _init_tables():
         reminders_def = "CREATE TABLE reminders (conv_id text, message text, timestamp integer)"
         _init_table('reminders', reminders_def, cursor)
 
-        image_group_def = '''\
-CREATE TABLE image_group (
-  id        INTEGER PRIMARY KEY ASC,
-  name      TEXT
-)
-'''
-        _init_table('image_group', image_group_def, cursor)
-
         alias_def = '''\
 CREATE TABLE alias (
   id        INTEGER PRIMARY KEY ASC,
@@ -54,8 +46,6 @@ CREATE TABLE image (
   url       TEXT,
   filename  TEXT,
   google_id TEXT,
-  group_id  INTEGER,
-  FOREIGN KEY(group_id) REFERENCES image_group(id)
 );
 '''
         _init_table('image', image_def, cursor)
