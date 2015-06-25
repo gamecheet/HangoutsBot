@@ -55,8 +55,7 @@ CREATE TABLE alias (
 CREATE TABLE image (
   id        INTEGER PRIMARY KEY ASC,
   url       TEXT,
-  filename  TEXT,
-  google_id TEXT
+  filename  TEXT
 );
 '''
         _init_table('image', image_def, cursor)
