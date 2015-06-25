@@ -45,7 +45,7 @@ CREATE TABLE image (
   id        INTEGER PRIMARY KEY ASC,
   url       TEXT,
   filename  TEXT,
-  google_id TEXT,
+  google_id TEXT
 );
 '''
         _init_table('image', image_def, cursor)
