@@ -130,10 +130,11 @@ def image(bot, event, *args):
 @DispatcherSingleton.register
 def img(bot, event, *args):
     if len(args) > 0 and args[0] == 'list':
-        aliases = load_json('image_aliases.json')
+        aliases = UtilDB.get_list_of_aliases()
+        #aliases = load_json('image_aliases.json')
         segments = []
-        for k in sorted(aliases.keys()):
-            segments.append(hangups.ChatMessageSegment(k))
+        for alias in aliases:
+            segments.append(hangups.ChatMessageSegment(alias))
             segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
         bot.send_message_segments(event.conv, segments)
     elif len(args) > 0 and args[0] == 'add':
