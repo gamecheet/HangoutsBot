@@ -759,3 +759,8 @@ def find_youtube_info(search_terms):
 
     return {'item_id':item_id, 'item_url':item_url, 'item_title':item_title}
 
+# thanks to Bruno Bronosky on StackOverflow
+def is_integer(i):
+    i = str(i)
+    return i=='0' or (i if i.find('..') > -1 else i.lstrip('-+').rstrip('0').rstrip('.')).isdigit()
+

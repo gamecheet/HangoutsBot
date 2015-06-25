@@ -656,11 +656,6 @@ def subreddit(bot, event, *args):
                                                              hangups.SegmentType.LINK,
                                                              link_target=link_url)])
 
-# thanks to Bruno Bronosky on StackOverflow
-def is_integer(i):
-    i = str(i)
-    return i=='0' or (i if i.find('..') > -1 else i.lstrip('-+').rstrip('0').rstrip('.')).isdigit()
-
 @DispatcherSingleton.register
 def isch(bot, event, *args):
     """
