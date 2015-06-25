@@ -164,6 +164,7 @@ def img(bot, event, *args):
             url, desc = image_info
         if desc is None and not is_alias:
             desc = ' '.join(args[1:])
+        print(image_id)
         if image_id is None:
             filename = UtilBot.download_image(url, 'images', False)
             image_id = yield from UtilBot.upload_image(bot, filename)

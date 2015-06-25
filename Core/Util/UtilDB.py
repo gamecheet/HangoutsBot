@@ -276,6 +276,12 @@ def set_imageid_for_url(url, google_id):
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
 
+        cursor.execute('''\
+INSERT INTO image(url)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE url = ?)
+''', (url, url))
+
         cursor.execute("""\
 UPDATE image
 SET google_id = ?
