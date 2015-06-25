@@ -746,25 +746,55 @@ def karma(bot, event, name=None, *args):
 
 @DispatcherSingleton.register_aliases(["isch"])
 def imagesearch(bot, event, *args):
+    num_requested = 0
+    if len(args) == 0:
+        bot.send_message(event.conv, "Error: requires more than 0 arguments.")
+        return
+    else:
+        if args[-1][0] == '@' and is_integer(args[-1][1:]):
+            # we subtract one here because image #1 is the 0 item in the list
+            num_requested = int(args[-1][1:]) - 1
+            args = args[:-1]
+
+    if num_requested > 7 or num_requested < 0:
+        bot.send_message(event.conv,
+                         "Error: result number must be between 1 and 8.")
+        return
+
     query = ' '.join(args)
     url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&safe=active&imgsz=medium&' \
           + parse.urlencode({'q': query})
 
     resp = request.urlopen(url)
     image_json = json.loads(resp.read().decode())
-    url = image_json['responseData']['results'][0]['unescapedUrl']
+    url = image_json['responseData']['results'][num_requested]['unescapedUrl']
 
     yield from send_image(bot, event, url)
 
 
 @DispatcherSingleton.register
 def gif(bot, event, *args):
+    num_requested = 0
+    if len(args) == 0:
+        bot.send_message(event.conv, "Error: requires more than 0 arguments.")
+        return
+    else:
+        if args[-1][0] == '@' and is_integer(args[-1][1:]):
+            # we subtract one here because image #1 is the 0 item in the list
+            num_requested = int(args[-1][1:]) - 1
+            args = args[:-1]
+
+    if num_requested > 9 or num_requested < 0:
+        bot.send_message(event.conv,
+                         "Error: result number must be between 1 and 10.")
+        return
+
     query = ' '.join(args)
     url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&safe=active&imgsz=medium&imgtype=animated&' \
           + parse.urlencode({'q': query})
     resp = request.urlopen(url)
     image_json = json.loads(resp.read().decode())
-    url = image_json['responseData']['results'][0]['unescapedUrl']
+    url = image_json['responseData']['results'][num_requested]['unescapedUrl']
 
     yield from send_image(bot, event, url)
 
