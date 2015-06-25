@@ -43,7 +43,7 @@ CREATE TABLE image_group (
         alias_def = '''\
 CREATE TABLE alias (
   id        INTEGER PRIMARY KEY ASC,
-  alias     TEXT
+  alias     TEXT UNIQUE
 )
 '''
         _init_table('alias', alias_def, cursor)
@@ -66,7 +66,8 @@ CREATE TABLE xref_image_alias (
   image_id  INTEGER,
   alias_id  INTEGER,
   FOREIGN KEY(image_id) REFERENCES image(id),
-  FOREIGN KEY(alias_id) REFERENCES alias(id)
+  FOREIGN KEY(alias_id) REFERENCES alias(id),
+  UNIQUE(image_id, alias_id)
 )
 '''
 
@@ -266,8 +267,7 @@ FROM image
 WHERE url = ?
 """, (url,))
         result = cursor.fetchone()
-        return result[0]
-        #return None if result is None else result[0]
+        return None if result is None else result[0]
 
 def get_imageid_for_filename(filename):
     if _database_file:
@@ -280,7 +280,7 @@ FROM image
 WHERE filename = ?
 """, (filename,))
         result = cursor.fetchone()
-        return result[0]
+        return None if result is None else result[0]
 
 def set_imageid_for_url(url, google_id):
     if _database_file:
@@ -334,6 +334,37 @@ SELECT image.id, ?
 FROM   image
 WHERE  image.url = ?
 ''', (alias_row_id, url))
+
+        database.commit()
+
+def set_alias_for_filename(filename, alias):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute('''\
+INSERT INTO alias(alias)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM alias WHERE alias = ?)
+''', (alias, alias))
+
+        alias_row_id = cursor.lastrowid
+
+        cursor.execute('''\
+INSERT INTO image(filename)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE filename = ?)
+''', (filename, filename))
+
+        try:
+            cursor.execute('''\
+INSERT INTO xref_image_alias(image_id, alias_id)
+SELECT image.id, (SELECT id FROM alias WHERE alias = ?)
+FROM   image
+WHERE  image.filename = ?
+''', (alias, filename))
+        except sqlite3.IntegrityError:
+            pass
 
         database.commit()
 
