@@ -229,7 +229,7 @@ def get_filenames_for_alias(alias):
 def get_imageids_for_alias(alias):
     return get_column_for_alias('google_id', alias)
 
-def get_imageid_for_url(url):
+def get_imageid_for_column(column, column_data):
     if _database_file:
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
@@ -237,23 +237,16 @@ def get_imageid_for_url(url):
         cursor.execute("""\
 SELECT google_id
 FROM image
-WHERE url = ?
-""", (url,))
+WHERE {} = ?
+""".format(column), (column_data,))
         result = cursor.fetchone()
         return None if result is None else result[0]
+
+def get_imageid_for_url(url):
+    return get_imageid_for_column('url', url)
 
 def get_imageid_for_filename(filename):
-    if _database_file:
-        database = sqlite3.connect(_database_file)
-        cursor = database.cursor()
-
-        cursor.execute("""\
-SELECT google_id
-FROM image
-WHERE filename = ?
-""", (filename,))
-        result = cursor.fetchone()
-        return None if result is None else result[0]
+    return get_imageid_for_filename('filename', filename)
 
 def set_imageid_for_url(url, google_id):
     if _database_file:
