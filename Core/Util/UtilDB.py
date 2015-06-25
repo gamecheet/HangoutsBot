@@ -221,28 +221,13 @@ WHERE alias.alias = ?
             return [x[0] for x in result]
 
 def get_urls_for_alias(alias):
-    get_column_for_alias('url', alias)
+    return get_column_for_alias('url', alias)
 
 def get_filenames_for_alias(alias):
-    get_column_for_alias('filename', alias)
+    return get_column_for_alias('filename', alias)
 
 def get_imageids_for_alias(alias):
-    if _database_file:
-        database = sqlite3.connect(_database_file)
-        cursor = database.cursor()
-
-        cursor.execute("""\
-SELECT image.google_id
-FROM xref_image_alias
-JOIN image ON xref_image_alias.image_id = image.id
-JOIN alias ON xref_image_alias.alias_id = alias.id
-WHERE alias.alias = ?
-""", (alias,))
-        result = cursor.fetchall()
-        if result is None or not result:
-            return None
-        else:
-            return [x[0] for x in result]
+    return get_column_for_alias('google_id', alias)
 
 def get_imageid_for_url(url):
     if _database_file:
