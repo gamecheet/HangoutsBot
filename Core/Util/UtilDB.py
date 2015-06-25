@@ -246,3 +246,26 @@ WHERE url = ?
 
         database.commit()
 
+def set_alias_for_url(url, alias):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute("INSERT INTO alias(alias) VALUES (?)", (alias,))
+        alias_row_id = cursor.lastrowid
+
+        cursor.execute('''\
+INSERT INTO image(url)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE url = ?)
+''', (url, url))
+
+        cursor.execute('''\
+INSERT INTO xref_image_alias(image_id, alias_id)
+SELECT image.id, ?
+FROM   image
+WHERE  image.url = ?
+''', (alias_row_id, url))
+
+        database.commit()
+
