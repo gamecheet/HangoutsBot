@@ -13,19 +13,24 @@ def setDatabase(db):
     _init_tables()
 
 
+def _init_table(table_name, table_def, cursor):
+    cursor.execute(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='{0}'"
+        .format(table_name)
+    )
+    if not cursor.fetchone():
+        cursor.execute(table_def)
+
 def _init_tables():
     if _database_file:
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
 
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='karma'")
-        if not cursor.fetchone():
-            cursor.execute("CREATE TABLE karma (user_id text, karma integer)")
+        karma_def = "CREATE TABLE karma (user_id text, karma integer)"
+        _init_table('karma', karma_def, cursor)
 
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='reminders'")
-        if not cursor.fetchone():
-            cursor.execute(
-                "CREATE TABLE reminders (conv_id text, message text, timestamp integer)")
+        reminders_def = "CREATE TABLE reminders (conv_id text, message text, timestamp integer)"
+        _init_table('reminders', reminders_def, cursor)
 
         database.commit()
         cursor.close()
