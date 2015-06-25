@@ -26,55 +26,25 @@ def me(bot, event, *args):
 def s(bot, event, *args):
     pass
 
-@DispatcherSingleton.register_hidden
+@DispatcherSingleton.register
 def load_ezhiks(bot, event, *args):
-    file_exception = False
-    # load ezhiks.json
-    try:
-        imageids_filename = 'ezhiks.json'
-        imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
-    except IOError as e:
-        if e.errno == errno.ENOENT:
-            imageids = {}
-        else:
-           print('Exception:')
-           print(str(e))
-           file_exception = True
     # loop through ezhiks folder
     for filename in glob(os.path.join('ezhiks', '*')):
         # if filename not in imageids, upload it and store filename,id
         filekey = os.path.split(filename)[1]
-        image_id = imageids.get(filekey)
+        image_id = UtilDB.get_imageid_for_filename(filekey)
         if image_id is None:
+            bot.send_message(event.conv, "Uploading ezhik: " + filekey)
             image_id = yield from UtilBot.upload_image(bot, filename)
-            if not file_exception:
-                imageids[filekey] = image_id
-                with open(imageids_filename, 'w') as f:
-                    json.dump(imageids, f, indent=2, sort_keys=True)
-                os.remove(filename)
+            UtilDB.set_imageid_for_filename(filekey, image_id)
+            ####os.remove(filename)
+        UtilDB.set_alias_for_filename(filekey, 'ezhik')
+    bot.send_message(event.conv, "Done.")
 
 @DispatcherSingleton.register
 def ezhik(bot, event, *args):
-    file_exception = False
-    try:
-        imageids_filename = 'ezhiks.json'
-        imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
-    except IOError as e:
-        imageids = {}
-        if e.errno == errno.ENOENT:
-           print('Exception: ezhiks.json not found!')
-        else:
-           print('Exception:')
-           print(str(e))
-           file_exception = True
-        return
-    image_id = imageids.get(random.choice(list(imageids.keys())))
-    if image_id is None:
-        print('Exception: ezhik not found (this should never happen!)')
-    else:
-        bot.send_message_segments(event.conv,
-            None,
-            image_id)
+    args = ['ezhik']
+    yield from img(bot, event, *args)
 
 def load_json(filename):
     try:
@@ -167,8 +137,10 @@ def img(bot, event, *args):
         alias = alias.lower()
         alias_url_list = UtilDB.get_urls_for_alias(alias)
         if alias_url_list is not None:
-            url = random.choice(alias_url_list)
-            is_alias = True
+            random_url = random.choice(alias_url_list)
+            if random_url is not None:
+                url = random_url
+                is_alias = True
         image_id_list = UtilDB.get_imageids_for_alias(alias)
         image_id = None
         if image_id_list is not None:
@@ -181,7 +153,6 @@ def img(bot, event, *args):
                 return            
         if image_id is None:
             image_id = UtilDB.get_imageid_for_url(url)
-        print(image_id)
         desc = None
         if not is_alias:
             image_info = UtilBot.get_image_info(url)
