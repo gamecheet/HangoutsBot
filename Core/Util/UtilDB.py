@@ -233,6 +233,19 @@ WHERE url = ?
         return result[0]
         #return None if result is None else result[0]
 
+def get_imageid_for_filename(filename):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute("""\
+SELECT google_id
+FROM image
+WHERE filename = ?
+""", (filename,))
+        result = cursor.fetchone()
+        return result[0]
+
 def set_imageid_for_url(url, google_id):
     if _database_file:
         database = sqlite3.connect(_database_file)
@@ -243,6 +256,25 @@ UPDATE image
 SET google_id = ?
 WHERE url = ?
 """, (google_id, url))
+
+        database.commit()
+
+def set_imageid_for_filename(filename, google_id):
+    if _database_file:
+        database = sqlite3.connect(_database_file)
+        cursor = database.cursor()
+
+        cursor.execute('''\
+INSERT INTO image(filename)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE filename = ?)
+''', (filename, filename))
+
+        cursor.execute("""\
+UPDATE image
+SET google_id = ?
+WHERE filename = ?
+""", (google_id, filename))
 
         database.commit()
 
