@@ -27,7 +27,7 @@ def _init_tables():
 
     image_id_def = '''\
 CREATE TABLE image_id (
-  db_id     INTEGER,
+  db_id     INTEGER UNIQUE,
   google_id TEXT
 )
 '''
@@ -207,7 +207,21 @@ def get_column_for_alias(column, alias):
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
 
-        cursor.execute("""\
+        if column == 'google_id':
+            cursor.execute("""\
+ATTACH DATABASE ? AS image_id
+""", (_imageids_db,))
+            cursor.execute("""\
+SELECT image_id.google_id
+FROM xref_image_alias
+JOIN image ON xref_image_alias.image_id = image.id
+JOIN alias ON xref_image_alias.alias_id = alias.id
+JOIN image_id ON xref_image_alias.image_id = image_id.db_id
+WHERE alias.alias = ?
+""".format(column), (alias,))
+
+        else:
+            cursor.execute("""\
 SELECT image.{}
 FROM xref_image_alias
 JOIN image ON xref_image_alias.image_id = image.id
@@ -235,9 +249,13 @@ def get_imageid_for_column(column, column_data):
         cursor = database.cursor()
 
         cursor.execute("""\
-SELECT google_id
-FROM image
-WHERE {} = ?
+ATTACH DATABASE ? AS image_id
+""", (_imageids_db,))
+
+        cursor.execute("""\
+SELECT image_id.google_id
+FROM image_id.image_id
+WHERE image_id.db_id = (SELECT id FROM image WHERE {} = ?)
 """.format(column), (column_data,))
         result = cursor.fetchone()
         return None if result is None else result[0]
@@ -246,12 +264,17 @@ def get_imageid_for_url(url):
     return get_imageid_for_column('url', url)
 
 def get_imageid_for_filename(filename):
-    return get_imageid_for_filename('filename', filename)
+    return get_imageid_for_column('filename', filename)
 
 def set_imageid_for_column(column, column_data, google_id):
+    print("setting imageid for column")
     if _database_file:
         database = sqlite3.connect(_database_file)
         cursor = database.cursor()
+
+        cursor.execute("""\
+ATTACH DATABASE ? AS image_id
+""", (_imageids_db,))
 
         cursor.execute('''\
 INSERT INTO image({})
@@ -259,11 +282,13 @@ SELECT ?
 WHERE NOT EXISTS (SELECT 1 FROM image WHERE {} = ?)
 '''.format(column, column), (column_data, column_data))
 
-        cursor.execute("""\
-UPDATE image
-SET google_id = ?
-WHERE {} = ?
-""".format(column), (google_id, column_data))
+        try:
+            cursor.execute("""\
+INSERT INTO image_id(db_id, google_id)
+SELECT (SELECT id FROM image WHERE {} = ?), ?
+""".format(column, column), (column_data, google_id))
+        except sqlite3.IntegrityError:
+            pass
 
         database.commit()
 
