@@ -744,8 +744,8 @@ def karma(bot, event, name=None, *args):
         bot.send_message_segments(event.conv, segments)
 
 
-@DispatcherSingleton.register_aliases(["img"])
-def image(bot, event, *args):
+@DispatcherSingleton.register_aliases(["isch"])
+def imagesearch(bot, event, *args):
     query = ' '.join(args)
     url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&safe=active&imgsz=medium&' \
           + parse.urlencode({'q': query})
@@ -776,8 +776,7 @@ def send_image(bot, event, url):
     except HTTPError:
         bot.send_message(event.conv, "Error attempting to upload image.")
         return
-    bot.send_message_segments(event.conv, [
-        hangups.ChatMessageSegment("Picture Message", segment_type=hangups.SegmentType.LINE_BREAK)],
+    bot.send_message_segments(event.conv, [],
                               image_id=image_id)
 
 
