@@ -2,46 +2,33 @@
 # coding=utf-8
 from datetime import date, datetime
 import os
+import random
 import sys
 import asyncio
+import tempfile
 import time
 import signal
 import traceback
+from urllib import request
+from urllib.request import FancyURLopener
 
 import hangups
 from hangups.ui.utils import get_conv_name
+from requests import HTTPError
 from Core.Commands.Dispatcher import DispatcherSingleton
 
-from Core.Util import ConfigDict
+from Core.Util import ConfigDict, UtilDB
 from Core import Handlers
 
 
+class HangoutsBotOpener(FancyURLopener):
+    version = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'
+
+
+request.urlretrieve = HangoutsBotOpener().retrieve
+
 __version__ = '1.1'
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-base_config = '''{
-  "admins": ["YOUR-USER-ID-HERE"],
-  "autoreplies_enabled": true,
-  "autoreplies": [
-    [["bot", "robot", "Yo"], "/think {}"]
-  ],
-  "development_mode": false,
-  "commands_admin": ["hangouts", "reload", "quit", "restart", "config", "restart", "block"],
-  "commands_conversation_admin": ["leave", "echo", "block"]
-  "commands_enabled": true,
-  "forwarding_enabled": false,
-  "rename_watching_enabled": true,
-  "conversations": {
-    "CONV-ID-HERE": {
-      "autoreplies": [
-        [["whistle", "bot", "whistlebot"], "/think {}"],
-        [["trash"], "You're trash"]
-      ],
-      "forward_to": [
-        "CONV1_ID"
-      ]
-    }
-  }
-}'''
 
 
 class ConversationEvent(object):
@@ -82,6 +69,9 @@ class HangoutsBot(object):
         self.config = ConfigDict.ConfigDict(config_path)
         self.devmode = self.get_config_suboption('', 'development_mode')
 
+        self.database = "database.db"
+        UtilDB.setDatabase(self.database)
+
         # Handle signals on Unix
         # (add_signal_handler is not implemented on Windows)
         try:
@@ -90,33 +80,6 @@ class HangoutsBot(object):
                 loop.add_signal_handler(signum, lambda: self.stop())
         except NotImplementedError:
             pass
-
-    @property
-    def dev(self):
-        return self.devmode
-
-    @dev.setter
-    def dev(self, value):
-        if value:
-            self.devmode = value
-        else:
-            self.devmode = False
-        if self.devmode:
-            def dev_send_segments(conversation, segments):
-                if len(segments) == 0:
-                    return
-                for segment in segments:
-                    print(segment.text if not segment.type_ == hangups.SegmentType.LINE_BREAK else "\n")
-
-            def dev_send(conversation, text):
-                dev_send_segments(conversation, [hangups.ChatMessageSegment(text)])
-
-            self.send_message_segments = dev_send_segments
-            self.send_message = dev_send
-        else:
-            self.send_message_segments = HangoutsBot("cookies.txt", "config.json").send_message_segments
-            self.send_message = HangoutsBot("cookies.txt", "config.json").send_message
-
 
     def restart(self):
         self.stop()
@@ -137,7 +100,7 @@ class HangoutsBot(object):
         """Connect to Hangouts and run bot"""
         cookies = self.login(self._cookies_path)
         if cookies:
-            for retry in range(self._max_retries):
+            while True:
                 try:
                     # Create Hangups client
                     self._client = hangups.Client(cookies)
@@ -155,9 +118,7 @@ class HangoutsBot(object):
                     log.writelines(str(datetime.now()) + ":\n " + traceback.format_exc() + "\n\n")
                     log.close()
                     print(traceback.format_exc())
-                    print('Waiting {} seconds...'.format(5 + retry * 5))
-                    time.sleep(5 + retry * 5)
-                    print('Trying to connect again (try {} of {})...'.format(retry + 1, self._max_retries))
+                    time.sleep(10)
             print('Maximum number of retries reached! Exiting...')
         sys.exit(1)
 
@@ -224,27 +185,26 @@ class HangoutsBot(object):
         if DispatcherSingleton.commands['record']:
             if event.conv_event.new_name == '':
                 text = "Name cleared"
-                directory = "Records" + "\\" + str(event.conv_id)
+                directory = "Records" + os.sep + str(event.conv_id)
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 filename = str(date.today()) + ".txt"
-                file = open(directory + '\\' + filename, "a+")
+                file = open(directory + os.sep + filename, "a+")
                 file.write(text + '\n')
             else:
                 text = "Name changed to: " + conv_event.new_name
-                directory = "Records" + "\\" + str(event.conv_id)
+                directory = "Records" + os.sep + str(event.conv_id)
                 if not os.path.exists(directory):
                     os.makedirs(directory)
                 filename = str(date.today()) + ".txt"
-                file = open(directory + '\\' + filename, "a+")
+                file = open(directory + os.sep + filename, "a+")
                 file.write(text + '\n')
 
     def send_message(self, conversation, text):
         """"Send simple chat message"""
         self.send_message_segments(conversation, [hangups.ChatMessageSegment(text)])
 
-    def send_message_segments(self, conversation, segments,
-                              image_id=None):
+    def send_message_segments(self, conversation, segments, image_id=None):
         """Send chat message segments"""
         # Ignore if the user hasn't typed a message.
         if len(segments) == 0:
@@ -255,14 +215,27 @@ class HangoutsBot(object):
             conversation.send_message(segments, image_id=image_id)
         ).add_done_callback(self._on_message_sent)
 
-    # DEPRECATED
-    def send_image(self, conversation, image_id, text=None):
-        segments = []
-        if text:
-            segments.append(hangups.ChatMessageSegment(text))
-        asyncio.async(
-            conversation.send_message(segments, image_id=image_id)
-        ).add_done_callback(self._on_message_sent)
+    @asyncio.coroutine
+    def upload_image(self, url, filename=None, delete=False):
+        if not filename:
+            tempdir = tempfile.gettempdir()
+            filename = tempdir + os.sep + '{}.png'.format(random.randint(0, 9999999999))
+        req = request.Request(url, headers={
+            'User-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36'})
+        image = request.urlopen(req)
+        try:
+            with open(filename, "wb") as image_file:
+                image_file.write(image.read())
+        except HTTPError as e:
+            raise e
+
+        # request.urlretrieve(url, filename)
+        file = open(filename, "rb")
+        image_id = yield from self._client.upload_image(file)
+        if delete:
+            file.close()
+            os.remove(filename)
+        return image_id
 
     def list_conversations(self):
         """List all active conversations"""
@@ -297,7 +270,6 @@ class HangoutsBot(object):
     def _on_connect(self, initial_data):
         """Handle connecting for the first time"""
         print('Connected!')
-        self._message_handler = Handlers.MessageHandler(self, command_char=self._command_char)
 
         self._user_list = hangups.UserList(self._client,
                                            initial_data.self_entity,
@@ -309,9 +281,11 @@ class HangoutsBot(object):
                                                    initial_data.sync_timestamp)
         self._conv_list.on_event.add_observer(self._on_event)
 
+        self._message_handler = Handlers.MessageHandler(self, command_char=self._command_char)
+
         print('Conversations:')
         for c in self.list_conversations():
-            print('  {} ({})'.format(get_conv_name(c, truncate=True), c.id_))
+            print(('  {} ({})'.format(get_conv_name(c, truncate=True), c.id_)).encode('UTF-8'))
         print()
 
         msg = "I'm alive!"

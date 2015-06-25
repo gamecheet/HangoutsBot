@@ -1,3 +1,5 @@
+from collections import deque
+from datetime import datetime
 import logging
 import shlex
 import asyncio
@@ -8,7 +10,7 @@ import hangups
 from Core.Commands.Dispatcher import DispatcherSingleton
 from Core.Commands import *  # Makes sure that all commands in the Command directory are imported and registered.
 
-from Core.Util.UtilBot import is_user_blocked
+from Core.Util.UtilBot import is_user_blocked, check_if_can_run_command
 
 
 class MessageHandler(object):
@@ -17,14 +19,22 @@ class MessageHandler(object):
     def __init__(self, bot, command_char='/'):
         self.bot = bot
         self.command_char = command_char
+        self.command_cache = deque(maxlen=20)
+        self.autoreply_cache = deque(maxlen=20)
+        self.TIME_OUT = 1
+        for listener in DispatcherSingleton.on_connect_listeners:
+            listener(bot)
 
     def word_in_text(self, word, text):
         """Return True if word is in text"""
-        escaped = word.encode('unicode-escape').decode()
-        if word != escaped:
-            return word in text
 
-        return True if re.search('\\b' + word + '\\b', text, re.IGNORECASE) else False
+        if word[0] == '^' and word[-1] == '$':
+            return re.match(word, text)
+        else:
+            escaped = word.encode('unicode-escape').decode()
+            if word != escaped:
+                return word in text
+            return True if re.search('\\b' + word + '\\b', text, re.IGNORECASE) else False
 
     @asyncio.coroutine
     def handle(self, event):
@@ -83,10 +93,16 @@ class MessageHandler(object):
                                   '{}: Not a valid command.'.format(event.user.full_name))
             return
 
-        line_args[0] = line_args[0].lower()
+        for prev_command in self.command_cache:
+            if prev_command[0] == event.user_id[0] and prev_command[1] == line_args[0] and (
+                        datetime.now() - prev_command[2]).seconds < self.TIME_OUT:
+                self.bot.send_message(event.conv, "Ignored duplicate command from %s." % event.user.full_name)
+                return
+        self.command_cache.append((event.user_id[0], line_args[0], datetime.now()))
 
-        # Test if user has permissions for running command
-        if self._check_if_can_run_command(event, line_args[0].replace(self.command_char, '')):
+
+        # Test if user has permissions for running command (and subcommand)
+        if check_if_can_run_command(self.bot, event, line_args[0].lower().replace(self.command_char, '')):
             # Run command
             yield from DispatcherSingleton.run(self.bot, event, self.command_char, *line_args[0:])
         else:
@@ -128,6 +144,12 @@ class MessageHandler(object):
         if not self.bot.get_config_suboption(event.conv_id, 'autoreplies_enabled'):
             return
 
+        for prev_auto in self.autoreply_cache:
+            if prev_auto[0] == event.user_id[0] and prev_auto[1] == event.text and (
+                        datetime.now() - prev_auto[2]).seconds < self.TIME_OUT:
+                self.bot.send_message(event.conv, "Ignored duplicate command from %s." % event.user.full_name)
+                return
+
         autoreplies_list = self.bot.get_config_suboption(event.conv_id, 'autoreplies')
         if autoreplies_list:
             for kwds, sentence in autoreplies_list:
@@ -136,25 +158,15 @@ class MessageHandler(object):
                         if sentence[0] == self.command_char:
                             yield from self.bot._client.settyping(event.conv_id)
                             event.text = sentence.format(event.text)
-                            yield from self.handle_command(event)
+
+                            # Cheating so auto-replies come through as System user.
+                            if not event.user.is_self:
+                                event.user.is_self = True
+                                yield from self.handle_command(event)
+                                event.user.is_self = False
+                            else:
+                                yield from self.handle_command(event)
+                            return
                         else:
+                            self.autoreply_cache.append((event.user_id[0], event.text, datetime.now()))
                             self.bot.send_message(event.conv, sentence)
-                        break
-
-    def _check_if_can_run_command(self, event, command):
-        commands_admin_list = self.bot.get_config_suboption(event.conv_id, 'commands_admin')
-        commands_conv_admin_list = self.bot.get_config_suboption(event.conv_id, 'commands_conversation_admin')
-        admins_list = self.bot.get_config_suboption(event.conv_id, 'admins')
-        conv_admin = self.bot.get_config_suboption(event.conv_id, 'conversation_admin')
-
-        # Check if this is a conversation admin command.
-        if commands_conv_admin_list and command in commands_conv_admin_list:
-            if (admins_list and event.user_id[0] not in admins_list) and (
-                        not conv_admin or (event.user_id[0] not in conv_admin)):
-                return False
-
-        # Check if this is a admin-only command.
-        if commands_admin_list and command in commands_admin_list:
-            if not admins_list or event.user_id[0] not in admins_list:
-                return False
-        return True
