@@ -21,7 +21,7 @@ class MessageHandler(object):
         self.command_char = command_char
         self.command_cache = deque(maxlen=20)
         self.autoreply_cache = deque(maxlen=20)
-        self.TIME_OUT = 1
+        self.TIME_OUT = 0.5 
         for listener in DispatcherSingleton.on_connect_listeners:
             listener(bot)
 

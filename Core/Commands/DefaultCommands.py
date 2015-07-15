@@ -763,7 +763,7 @@ def imagesearch(bot, event, *args):
         return
 
     query = ' '.join(args)
-    url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&imgsz=medium&' \
+    url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&' \
           + parse.urlencode({'q': query})
 
     resp = request.urlopen(url)
@@ -791,7 +791,7 @@ def gif(bot, event, *args):
         return
 
     query = ' '.join(args)
-    url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&imgsz=medium&imgtype=animated&' \
+    url = 'http://ajax.googleapis.com/ajax/services/search/images?v=1.0&rsz=8&imgtype=animated&' \
           + parse.urlencode({'q': query})
     resp = request.urlopen(url)
     image_json = json.loads(resp.read().decode())

@@ -3,6 +3,7 @@ import json
 import sqlite3
 
 _database_file = 'database.db'
+_imageids_db = 'image_ids.db'
 
 def migrate_imageids():
     imageids_filename = 'imageids.json'
@@ -108,7 +109,89 @@ WHERE  image.filename = ?
     cursor.close()
     database.close()
 
+def migrate_imageids2():
+    imageids_filename = 'imageids.json'
+    imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
 
-migrate_imageids()        
+    database = sqlite3.connect(_database_file)
+    cursor = database.cursor()
+
+    cursor.execute("""\
+ATTACH DATABASE ? AS image_id
+""", (_imageids_db,))
+
+    imageids_list = list(imageids.items())
+    print(imageids_list)
+#    imageids_list = [(t[1], t[0]) for t in imageids_list]
+    cursor.executemany(
+        """\
+INSERT INTO image_id(db_id, google_id)
+SELECT (SELECT id FROM image WHERE url = ?), ?
+""", imageids_list
+    )
+
+    database.commit()
+    cursor.close()
+    database.close()
+
+def migrate_ezhiks2():
+    imageids_filename = 'ezhiks.json'
+    imageids = json.loads(open(imageids_filename, encoding='utf-8').read(), encoding='utf-8')
+
+    database = sqlite3.connect(_database_file)
+    cursor = database.cursor()
+
+    cursor.execute("""\
+ATTACH DATABASE ? AS image_id
+""", (_imageids_db,))
+
+    for filename in sorted(imageids.keys()):
+        oldfilename = filename
+        filename = os.path.join('ezhik', filename)
+        cursor.execute('''\
+INSERT INTO image(filename)
+VALUES (?)
+''', (filename,))
+
+        db_id = cursor.lastrowid
+
+        cursor.execute('''\
+INSERT INTO image_id(db_id, google_id)
+VALUES (?, ?)
+''', (db_id, imageids[oldfilename]))
+
+        alias = 'ezhik'
+
+        cursor.execute('''\
+INSERT INTO alias(alias)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM alias WHERE alias = ?)
+''', (alias, alias))
+
+        alias_row_id = cursor.lastrowid
+
+        cursor.execute('''\
+INSERT INTO image(filename)
+SELECT ?
+WHERE NOT EXISTS (SELECT 1 FROM image WHERE filename = ?)
+''', (filename, filename))
+
+        try:
+            cursor.execute('''\
+INSERT INTO xref_image_alias(image_id, alias_id)
+SELECT image.id, (SELECT id FROM alias WHERE alias = ?)
+FROM   image
+WHERE  image.filename = ?
+''', (alias, filename))
+        except sqlite3.IntegrityError:
+            pass
+
+    database.commit()
+    cursor.close()
+    database.close()
+#migrate_imageids()        
 migrate_image_aliases()
-migrate_ezhiks()
+#migrate_ezhiks()
+#migrate_imageids2()
+#migrate_ezhiks2()
+

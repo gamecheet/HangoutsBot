@@ -174,6 +174,12 @@ def img(bot, event, *args):
             [hangups.ChatMessageSegment(desc)] if desc else None,
             image_id)
 
+@DispatcherSingleton.register_hidden
+def send_image(bot, event, image_id, desc=None):
+    bot.send_message_segments(event.conv,
+        [hangups.ChatMessageSegment(desc)] if desc else None,
+        image_id)
+
 @DispatcherSingleton.register
 def log(bot, event, *args):
     msg = ' '.join(args)
@@ -434,7 +440,7 @@ Purpose: Renders LaTeX code to an image and sends it
         filename = output[1:33] + '.png'
         filename = os.path.join('images', filename)
         image_id = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, image_id)
+        send_image(bot, event, image_id)
 
 @DispatcherSingleton.register
 def greentext(bot, event, *args):
@@ -469,7 +475,7 @@ def greentext(bot, event, *args):
         if output != '':
             bot.send_message(event.conv, output)
         image_id = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, image_id)
+        send_image(bot, event, image_id)
         os.remove(filename)
     except subprocess.CalledProcessError as e:
         output = e.output.decode(encoding='UTF-8')
@@ -494,7 +500,7 @@ def color(bot, event, *args):
         if output != '':
             bot.send_message(event.conv, output)
         image_id = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, image_id)
+        send_image(bot, event, image_id)
         os.remove(filename)
     except subprocess.CalledProcessError as e:
         output = e.output.decode(encoding='UTF-8')
@@ -526,7 +532,7 @@ def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
             bot.send_message(event.conv, output)
 
         image_id = yield from UtilBot.upload_image(bot, filename)
-        bot.send_image(event.conv, image_id)
+        send_image(bot, event, image_id)
         os.remove(filename)
     except http.client.BadStatusLine as e:
         display.stop()
