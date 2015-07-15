@@ -42,6 +42,11 @@ class CommandDispatcher(object):
             args = list(args)
             print(args)
             args.insert(1, args[0][3:])
+        elif command[:2] == 'v/':
+            command = 'subverse'
+            args = list(args)
+            print(args)
+            args.insert(1, args[0][3:])
         try:
             func = self.commands[command]
         except KeyError:
