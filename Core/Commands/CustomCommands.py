@@ -447,7 +447,7 @@ def greentext(bot, event, *args):
     """
     *Greentext*
     Usage: /greentext <text>
-    Purpose: makes your text green and adds an epic maymay arrow
+    Purpose: makes your text green and adds an epic maymay arrow, add more maymay arrows for more fun
     """
     filename = 'greentext.png'
     message = ' '.join(args)
@@ -460,7 +460,7 @@ def greentext(bot, event, *args):
            '-size',
            '164x',
            '-font',
-           '/usr/share/fonts/truetype/windows/arial.ttf',
+           '/usr/share/fonts/TTF/arial.ttf',
            '-pointsize',
            '13',
            '-fill',
@@ -540,7 +540,7 @@ def send_webpage_screenshot(bot, event, url, viewportsize='1280x1024'):
 
 def path2url(path):
     return parse.urljoin(
-      'file:', request.pathname2url(os.path.abspath(path)))
+      'file://localhost', request.pathname2url(os.path.abspath(path)))
 
 @DispatcherSingleton.register
 def html(bot, event, *args):

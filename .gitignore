@@ -1,1 +1,8 @@
 *.pyc
+config.json
+config.old
+cookies.txt
+database.db
+image_ids.db
+images/
+tmp.html
