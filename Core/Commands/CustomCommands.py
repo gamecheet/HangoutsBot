@@ -182,12 +182,20 @@ def send_image(bot, event, image_id, desc=None):
 
 @DispatcherSingleton.register
 def log(bot, event, *args):
-    msg = ' '.join(args)
-    log = open('log.txt', 'a+')
-    log.writelines(msg + "\n")
-    for c in msg: log.writelines(hex(ord(c)) + " ")
-    log.writelines("\n")
-    log.close()
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*log*
+Usage: /log <text>
+Purpose: Logs text to the log.txt file.
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+        msg = ' '.join(args)
+        log = open('log.txt', 'a+')
+        log.writelines(msg + "\n")
+        for c in msg: log.writelines(hex(ord(c)) + " ")
+        log.writelines("\n")
+        log.close()
 
 @DispatcherSingleton.register
 def rate(bot, event, *args):
@@ -206,11 +214,18 @@ def rate(bot, event, *args):
                   ,dumb       ="\U0001f4e6"
                   ,box        ="\U0001f4e6"
                   )
-
-    try:
-        bot.send_message(event.conv, ratings[args[0]])
-    except KeyError:
-        bot.send_message(event.conv, "That's not a valid rating. You are \U0001f4e6 x 1")
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*rate*
+Usage: /rate <rating>
+Purpose: Responds to your rating, ratings are agree, disagree, funny, winner, zing, informative, friendly, optimistic, artistic, late, dumb and box.
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+        try:
+            bot.send_message(event.conv, ratings[args[0]])
+        except KeyError:
+            bot.send_message(event.conv, "That's not a valid rating. You are \U0001f4e6 x 1")
 
 @DispatcherSingleton.register
 def navyseals(bot, event, *args):
@@ -249,9 +264,9 @@ it. You're fucking dead, kiddo.''')
 def yt(bot, event, *args):
     youtube(bot, event, *args)
     
-@DispatcherSingleton.register
-def YouTube(bot, event, *args):
-    youtube(bot, event, *args)
+# @DispatcherSingleton.register
+# def YouTube(bot, event, *args):
+#     youtube(bot, event, *args)
     
 @DispatcherSingleton.register
 def xfiles(bot, event, *args):
@@ -268,18 +283,26 @@ Purpose: but what if bot is not kill
 
 @DispatcherSingleton.register
 def ytban(bot, event, *args):
-    search_terms = " ".join(args)
-    youtube_info = UtilBot.find_youtube_info(search_terms)
-    youtube_banlist = load_json('youtube_banlist.json')
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*YTBan*
+Usage: /ytban <search parameters>
+Purpose: Get the first result from YouTube\'s search using search parameter, then bans it!
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+        search_terms = " ".join(args)
+        youtube_info = UtilBot.find_youtube_info(search_terms)
+        youtube_banlist = load_json('youtube_banlist.json')
 
-    if youtube_info['item_id'] not in youtube_banlist:
-        youtube_banlist.append(youtube_info['item_id'])
+        if youtube_info['item_id'] not in youtube_banlist:
+            youtube_banlist.append(youtube_info['item_id'])
 
-    bot.send_message(event.conv,
-                     'Video "{title}" with ID "{id}" is now banned'.format(
-                       title=youtube_info['item_title'], id=youtube_info['item_id']))
+        bot.send_message(event.conv,
+                         'Video "{title}" with ID "{id}" is now banned'.format(
+                           title=youtube_info['item_title'], id=youtube_info['item_id']))
 
-    save_json('youtube_banlist.json', youtube_banlist)
+        save_json('youtube_banlist.json', youtube_banlist)
 
 @DispatcherSingleton.register
 def youtube(bot, event, *args):
@@ -320,24 +343,32 @@ def linktest(bot, event, *args):
 
 @DispatcherSingleton.register
 def roulette(bot, event, *args):
-    #static variables
-    if not hasattr(roulette, "_rouletteChamber"):
-        roulette._rouletteChamber = random.randrange(0, 6)
-    if not hasattr(roulette, "_rouletteBullet"):
-        roulette._rouletteBullet = random.randrange(0, 6)
-
-    if len(args) > 0 and args[0] == 'spin':
-        roulette._rouletteBullet = random.randrange(0, 6)
-        bot.send_message(event.conv, '*SPIN* Are you feeling lucky?')
-        return
-    if roulette._rouletteChamber == roulette._rouletteBullet:
-        roulette._rouletteBullet = random.randrange(0, 6)
-        roulette._rouletteChamber = random.randrange(0, 6)
-        bot.send_message(event.conv, '*BANG*')
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*Roulette*
+Usage: /roulette
+Purpose: Spins the chamber and tries to shoot you in the head
+""")
+        bot.send_message_segments(event.conv, segments)
     else:
-        bot.send_message(event.conv, '*click*')
-        roulette._rouletteChamber += 1
-        roulette._rouletteChamber %= 6
+        #static variables
+        if not hasattr(roulette, "_rouletteChamber"):
+            roulette._rouletteChamber = random.randrange(0, 6)
+        if not hasattr(roulette, "_rouletteBullet"):
+            roulette._rouletteBullet = random.randrange(0, 6)
+
+        if len(args) > 0 and args[0] == 'spin':
+            roulette._rouletteBullet = random.randrange(0, 6)
+            bot.send_message(event.conv, '*SPIN* Are you feeling lucky?')
+            return
+        if roulette._rouletteChamber == roulette._rouletteBullet:
+            roulette._rouletteBullet = random.randrange(0, 6)
+            roulette._rouletteChamber = random.randrange(0, 6)
+            bot.send_message(event.conv, '*BANG*')
+        else:
+            bot.send_message(event.conv, '*click*')
+            roulette._rouletteChamber += 1
+            roulette._rouletteChamber %= 6
 
 #TODO: move this to UtilBot or find a native replacement
 def choice(iterable):
@@ -383,10 +414,18 @@ def _checkTheBall(questionLength):
 
 @DispatcherSingleton.register
 def eightball(bot, event, *args):
-    if len(args) > 0:
-        bot.send_message(event.conv, _checkTheBall(len(' '.join(args))))
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+*Eightball*
+Usage: /eightball
+Purpose: Tells fortunes!
+""")
+        bot.send_message_segments(event.conv, segments)
     else:
-        bot.send_message(event.conv, _checkTheBall(random.randint(0, 2)))
+        if len(args) > 0:
+            bot.send_message(event.conv, _checkTheBall(len(' '.join(args))))
+        else:
+            bot.send_message(event.conv, _checkTheBall(random.randint(0, 2)))
 
 @DispatcherSingleton.register
 def source(bot, event, *args):
