@@ -690,19 +690,19 @@ Purpose: Responds with url for the specidied subverse, voat is cool right?
 """)
         bot.send_message_segments(event.conv, segments)
     else:
-    subverse = args[0]
-    voat_url_prefix = 'https://www.voat.co/v/'
-    link_url = voat_url_prefix + subverse
+        subverse = args[0]
+        voat_url_prefix = 'https://www.voat.co/v/'
+        link_url = voat_url_prefix + subverse
 
-    user_agent = 'python:HangoutsBot:r233 (by /u/shillbert)'
-    res = requests.head(link_url, headers={'User-Agent': user_agent})
-    if (res.status_code == 404 or
-           (res.status_code == 302 and
-            'subverses/search' in res.headers.get('location'))):
-        bot.send_message(event.conv, "That subverse does not exist.")
-    else:
-        bot.send_message_segments(event.conv,
-                                  [hangups.ChatMessageSegment(link_url,
-                                                             hangups.SegmentType.LINK,
-                                                             link_target=link_url)])
+        user_agent = 'python:HangoutsBot:r233 (by /u/shillbert)'
+        res = requests.head(link_url, headers={'User-Agent': user_agent})
+        if (res.status_code == 404 or
+               (res.status_code == 302 and
+                'subverses/search' in res.headers.get('location'))):
+            bot.send_message(event.conv, "That subverse does not exist.")
+        else:
+            bot.send_message_segments(event.conv,
+                                      [hangups.ChatMessageSegment(link_url,
+                                                                 hangups.SegmentType.LINK,
+                                                                 link_target=link_url)])
 
