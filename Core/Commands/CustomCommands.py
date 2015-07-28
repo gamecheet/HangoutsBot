@@ -184,7 +184,7 @@ def send_image(bot, event, image_id, desc=None):
 def log(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*log*
+**Log**
 Usage: /log <text>
 Purpose: Logs text to the log.txt file.
 """)
@@ -216,7 +216,7 @@ def rate(bot, event, *args):
                   )
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*rate*
+**Rate**
 Usage: /rate <rating>
 Purpose: Responds to your rating, ratings are agree, disagree, funny, winner, zing, informative, friendly, optimistic, artistic, late, dumb and box.
 """)
@@ -231,7 +231,7 @@ Purpose: Responds to your rating, ratings are agree, disagree, funny, winner, zi
 def navyseals(bot, event, *args):
      if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*Navy Seals*
+**Navy Seals**
 Usage: /navyseals
 Purpose: Shits fury all over you.
 """)
@@ -272,7 +272,7 @@ def yt(bot, event, *args):
 def xfiles(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*xfiles*
+**Xfiles**
 Usage: /xfiles
 Purpose: but what if bot is not kill
 """)
@@ -285,7 +285,7 @@ Purpose: but what if bot is not kill
 def ytban(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*YTBan*
+**YTBan**
 Usage: /ytban <search parameters>
 Purpose: Get the first result from YouTube\'s search using search parameter, then bans it!
 """)
@@ -309,7 +309,7 @@ def youtube(bot, event, *args):
     Segment = hangups.ChatMessageSegment
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*YouTube*
+**YouTube**
 Usage: /youtube <optional: search parameter>
 Purpose: Get the first result from YouTube\'s search using search parameter.
 """)
@@ -345,7 +345,7 @@ def linktest(bot, event, *args):
 def roulette(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*Roulette*
+**Roulette**
 Usage: /roulette
 Purpose: Spins the chamber and tries to shoot you in the head
 """)
@@ -416,7 +416,7 @@ def _checkTheBall(questionLength):
 def eightball(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*Eightball*
+**Eightball**
 Usage: /eightball
 Purpose: Tells fortunes!
 """)
@@ -431,7 +431,7 @@ Purpose: Tells fortunes!
 def source(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*Source*
+**Source**
 Usage: /source
 Purpose: Links to the GitHub
 """)
@@ -447,7 +447,7 @@ Purpose: Links to the GitHub
 def fliptext(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*Flip Text*
+**Flip Text**
 Usage: /fliptext <text>
 Purpose: Flips your message 180 degrees
 """)
@@ -462,7 +462,7 @@ Purpose: Flips your message 180 degrees
 def latex(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
-*LaTeX*
+**LaTeX**
 Usage: /latex <LaTeX code>
 Purpose: Renders LaTeX code to an image and sends it
 """)
@@ -484,7 +484,7 @@ Purpose: Renders LaTeX code to an image and sends it
 @DispatcherSingleton.register
 def greentext(bot, event, *args):
     """
-    *Greentext*
+    **Greentext**
     Usage: /greentext <text>
     Purpose: makes your text green and adds an epic maymay arrow, add more maymay arrows for more fun
     """
@@ -631,41 +631,65 @@ def is_valid_url(url):
 
 @DispatcherSingleton.register
 def webshot(bot, event, *args):
-    if len(args) == 1:
-        url = args[0]
-        viewportsize = '1280x1024'
-    elif len(args) > 1:
-        url = args[0]
-        viewportsize = args[1]
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+**Webshot**
+Usage: /webshot <url>
+Purpose: Screenshots a webpage
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
+        if len(args) == 1:
+            url = args[0]
+            viewportsize = '1280x1024'
+        elif len(args) > 1:
+            url = args[0]
+            viewportsize = args[1]
 
-    if not is_valid_url(url):
-        url = 'http://' + url
         if not is_valid_url(url):
-            bot.send_message(event.conv, "Error: invalid URL.")
-            return            
+            url = 'http://' + url
+            if not is_valid_url(url):
+                bot.send_message(event.conv, "Error: invalid URL.")
+                return            
 
-    yield from send_webpage_screenshot(bot, event, url, viewportsize)
+        yield from send_webpage_screenshot(bot, event, url, viewportsize)
 
 @DispatcherSingleton.register
 def subreddit(bot, event, *args):
-    subreddit = args[0]
-    reddit_url_prefix = 'https://www.reddit.com/r/'
-    link_url = reddit_url_prefix + subreddit
-
-    user_agent = 'python:HangoutsBot:r233 (by /u/shillbert)'
-    res = requests.head(link_url, headers={'User-Agent': user_agent})
-    if (res.status_code == 404 or
-           (res.status_code == 302 and
-            'subreddits/search' in res.headers.get('location'))):
-        bot.send_message(event.conv, "That subreddit does not exist.")
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+**SubReddit**
+Usage: /subreddit <subreddit>
+Purpose: Responds with url for the specified subreddit
+""")
+        bot.send_message_segments(event.conv, segments)
     else:
-        bot.send_message_segments(event.conv,
-                                  [hangups.ChatMessageSegment(link_url,
-                                                             hangups.SegmentType.LINK,
-                                                             link_target=link_url)])
+        subreddit = args[0]
+        reddit_url_prefix = 'https://www.reddit.com/r/'
+        link_url = reddit_url_prefix + subreddit
+
+        user_agent = 'python:HangoutsBot:r233 (by /u/shillbert)'
+        res = requests.head(link_url, headers={'User-Agent': user_agent})
+        if (res.status_code == 404 or
+               (res.status_code == 302 and
+                'subreddits/search' in res.headers.get('location'))):
+            bot.send_message(event.conv, "That subreddit does not exist.")
+        else:
+            bot.send_message_segments(event.conv,
+                                      [hangups.ChatMessageSegment(link_url,
+                                                                 hangups.SegmentType.LINK,
+                                                                 link_target=link_url)])
 
 @DispatcherSingleton.register
 def subverse(bot, event, *args):
+    if ''.join(args) == '?':
+        segments = UtilBot.text_to_segments("""\
+**SubVerse**
+Usage: /subverse <subverse>
+Purpose: Responds with url for the specidied subverse, voat is cool right?
+""")
+        bot.send_message_segments(event.conv, segments)
+    else:
     subverse = args[0]
     voat_url_prefix = 'https://www.voat.co/v/'
     link_url = voat_url_prefix + subverse
