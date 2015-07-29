@@ -1,10 +1,11 @@
-import html
 import asyncio
 import json
 from urllib import parse
 from urllib import request
 import re
 from urllib.error import HTTPError, URLError
+import html
+import os
 
 from bs4 import BeautifulSoup
 import hangups
@@ -28,9 +29,7 @@ last_recorded, last_recorder = None, None
 
 @DispatcherSingleton.register_unknown
 def unknown_command(bot, event, *args):
-    bot.send_message(event.conv,
-                     '{}: Unknown command!'.format(event.user.full_name))
-
+    yield from bot.send_message(event.conv, '{}: Unknown command!'.format(event.user.full_name))
 
 @DispatcherSingleton.register
 def think(bot, event, *args):
@@ -58,19 +57,19 @@ def help(bot, event, command=None, *args):
     **Current Implemented Commands:**
     {}
     Use: /<command name> ? or /help <command name> to find more information about the command.
-    """.format(', '.join(valid_user_commands))
+    """.format(', '.join(sorted(DispatcherSingleton.commands.keys())))
     if command == '?' or command is None:
-        bot.send_message_segments(event.conv, UtilBot.text_to_segments(docstring))
+        yield from bot.send_message_segments(event.conv, UtilBot.text_to_segments(docstring))
     else:
         if command in DispatcherSingleton.commands.keys():
             func = DispatcherSingleton.commands[command]
             if func.__doc__:
-                bot.send_message_segments(event.conv, UtilBot.text_to_segments(func.__doc__))
+                yield from bot.send_message_segments(event.conv, UtilBot.text_to_segments(func.__doc__))
             else:  # Compatibility purposes for the old way of showing help text.
                 args = ['?']
-                func(bot, event, *args)
+                yield from func(bot, event, *args)
         else:
-            bot.send_message("The command {} is not registered.".format(command))
+            yield from bot.send_message("The command {} is not registered.".format(command))
 
 
 @DispatcherSingleton.register
