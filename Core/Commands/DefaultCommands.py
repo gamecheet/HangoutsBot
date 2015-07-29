@@ -417,7 +417,7 @@ def clear(bot, event, *args):
                 hangups.ChatMessageSegment('Intentionally not displayed.', hangups.SegmentType.LINE_BREAK),
                 hangups.ChatMessageSegment('Intentionally not displayed.', hangups.SegmentType.LINE_BREAK),
                 hangups.ChatMessageSegment('Intentionally not displayed.', hangups.SegmentType.LINE_BREAK)]
-    yield from bot.send_message_segments(event.conv, segments)
+    bot.send_message_segments(event.conv, segments)
 
 
 @DispatcherSingleton.register
