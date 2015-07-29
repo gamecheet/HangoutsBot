@@ -248,7 +248,7 @@ def echo(bot, event, *args):
     Usage: /echo <text to echo>
     Purpose: Bot will echo the inputted text.
     """
-    bot.send_message(event.conv, '{}'.format(' '.join(args)))
+    yield from bot.send_message(event.conv, '{}'.format(' '.join(args)))
 
 
 @DispatcherSingleton.register
