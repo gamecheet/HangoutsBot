@@ -29,7 +29,7 @@ last_recorded, last_recorder = None, None
 
 @DispatcherSingleton.register_unknown
 def unknown_command(bot, event, *args):
-    yield from bot.send_message(event.conv, '{}: Unknown command!'.format(event.user.full_name))
+    bot.send_message(event.conv, '{}: Unknown command!'.format(event.user.full_name))
 
 # @DispatcherSingleton.register
 # def think(bot, event, *args):
@@ -67,9 +67,9 @@ def help(bot, event, command=None, *args):
                 bot.send_message_segments(event.conv, UtilBot.text_to_segments(func.__doc__))
             else:  # Compatibility purposes for the old way of showing help text.
                 args = ['?']
-                yield from func(bot, event, *args)
+                func(bot, event, *args)
         else:
-            yield from bot.send_message("The command {} is not registered.".format(command))
+            bot.send_message("The command {} is not registered.".format(command))
 
 
 @DispatcherSingleton.register
@@ -248,7 +248,7 @@ def echo(bot, event, *args):
     Usage: /echo <text to echo>
     Purpose: Bot will echo the inputted text.
     """
-    yield from bot.send_message(event.conv, '{}'.format(' '.join(args)))
+    bot.send_message(event.conv, '{}'.format(' '.join(args)))
 
 
 @DispatcherSingleton.register
