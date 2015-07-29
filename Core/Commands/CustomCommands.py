@@ -269,14 +269,6 @@ def yt(bot, event, *args):
 #     youtube(bot, event, *args)
 
 @DispatcherSingleton.register
-def t(bot, event, *args):
-    think(bot, event, *args)
-    
-@DispatcherSingleton.register
-def gt(bot, event, *args):
-    greentext(bot, event, *args)    
-
-@DispatcherSingleton.register
 def xfiles(bot, event, *args):
     if ''.join(args) == '?':
         segments = UtilBot.text_to_segments("""\
