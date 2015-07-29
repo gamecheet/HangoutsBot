@@ -59,12 +59,12 @@ def help(bot, event, command=None, *args):
     Use: /<command name> ? or /help <command name> to find more information about the command.
     """.format(', '.join(sorted(DispatcherSingleton.commands.keys())))
     if command == '?' or command is None:
-        yield from bot.send_message_segments(event.conv, UtilBot.text_to_segments(docstring))
+        bot.send_message_segments(event.conv, UtilBot.text_to_segments(docstring))
     else:
         if command in DispatcherSingleton.commands.keys():
             func = DispatcherSingleton.commands[command]
             if func.__doc__:
-                yield from bot.send_message_segments(event.conv, UtilBot.text_to_segments(func.__doc__))
+                bot.send_message_segments(event.conv, UtilBot.text_to_segments(func.__doc__))
             else:  # Compatibility purposes for the old way of showing help text.
                 args = ['?']
                 yield from func(bot, event, *args)
