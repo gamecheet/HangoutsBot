@@ -31,20 +31,20 @@ last_recorded, last_recorder = None, None
 def unknown_command(bot, event, *args):
     yield from bot.send_message(event.conv, '{}: Unknown command!'.format(event.user.full_name))
 
-@DispatcherSingleton.register
-def think(bot, event, *args):
-    if not hasattr(think, "_clever_sessions"):
-        think._clever_sessions = {}
-    clever_sessions = think._clever_sessions
-    clever_session = clever_sessions.get(event.user.id_.chat_id)
-    if clever_session is None:
-        clever_sessions[event.user.id_.chat_id] = ChatterBotFactory().create(ChatterBotType.CLEVERBOT).create_session()
-        clever_session = clever_sessions[event.user.id_.chat_id]
-    message = clever_session.think(' '.join(args))
-    message = re.sub(r'\|(([0-9]|[A-Z]){4})', r'\\u\1', message)
-    message = bytes(message, 'ascii').decode('unicode-escape')
-    message = html.unescape(message)
-    bot.send_message(event.conv, message)
+# @DispatcherSingleton.register
+# def think(bot, event, *args):
+#     if not hasattr(think, "_clever_sessions"):
+#         think._clever_sessions = {}
+#     clever_sessions = think._clever_sessions
+#     clever_session = clever_sessions.get(event.user.id_.chat_id)
+#     if clever_session is None:
+#         clever_sessions[event.user.id_.chat_id] = ChatterBotFactory().create(ChatterBotType.CLEVERBOT).create_session()
+#         clever_session = clever_sessions[event.user.id_.chat_id]
+#     message = clever_session.think(' '.join(args))
+#     message = re.sub(r'\|(([0-9]|[A-Z]){4})', r'\\u\1', message)
+#     message = bytes(message, 'ascii').decode('unicode-escape')
+#     message = html.unescape(message)
+#     bot.send_message(event.conv, message)
 
 
 @DispatcherSingleton.register
